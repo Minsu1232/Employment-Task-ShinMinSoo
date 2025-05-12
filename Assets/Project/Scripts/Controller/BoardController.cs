@@ -38,7 +38,7 @@ public partial class BoardController : MonoBehaviour
 
     private readonly float blockDistance = 0.79f;
 
-    private int nowStageIndex = 1;
+    private int nowStageIndex = 0;
 
     private void Awake()
     {
