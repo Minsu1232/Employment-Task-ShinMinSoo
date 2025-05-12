@@ -52,91 +52,9 @@ namespace Project.Scripts.Presenter
 
         private void SetupVisuals()
         {
-            // 자물쇠 시각적 표현 생성
-            lockVisual = new GameObject("LockVisual");
-            lockVisual.transform.SetParent(targetObject.transform);
-            lockVisual.transform.localPosition = new Vector3(0, 0.1f, 0);
-
-            // 자물쇠 모양 생성
-            GameObject lockBody = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            lockBody.transform.SetParent(lockVisual.transform);
-            lockBody.transform.localPosition = Vector3.zero;
-            lockBody.transform.localScale = new Vector3(0.2f, 0.2f, 0.05f);
-
-            GameObject lockShackle = GameObject.CreatePrimitive(PrimitiveType.Torus);
-            if (lockShackle == null) // 토러스가 기본 프리미티브에 없는 경우
-            {
-                lockShackle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                lockShackle.transform.localScale = new Vector3(0.1f, 0.1f, 0.02f);
-            }
-            lockShackle.transform.SetParent(lockVisual.transform);
-            lockShackle.transform.localPosition = new Vector3(0, 0.15f, 0);
-            lockShackle.transform.localScale = new Vector3(0.1f, 0.1f, 0.02f);
-
-            // 카운트 텍스트 생성
-            GameObject textObj = new GameObject("CountText");
-            textObj.transform.SetParent(lockVisual.transform);
-            textObj.transform.localPosition = new Vector3(0, 0, -0.03f);
-
-            countText = textObj.AddComponent<TextMesh>();
-            countText.text = remainingCount.ToString();
-            countText.fontSize = 20;
-            countText.alignment = TextAlignment.Center;
-            countText.anchor = TextAnchor.MiddleCenter;
-            countText.color = Color.white;
-
-            // 자물쇠 ID에 따른 색상 설정
-            Color lockColor = GetLockColor(lockId);
-
-            // 자물쇠 머티리얼 설정
-            SetLockColor(lockBody, lockColor);
-            SetLockColor(lockShackle, lockColor);
-
-            // 자물쇠 애니메이션 시작
-            StartLockAnimation();
+            // 자물쇠 시각적 표현 생성           
         }
-
-        private void SetLockColor(GameObject obj, Color color)
-        {
-            Renderer renderer = obj.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                renderer.material.color = color;
-
-                // 메탈릭 효과
-                renderer.material.SetFloat("_Metallic", 0.8f);
-                renderer.material.SetFloat("_Glossiness", 0.8f);
-            }
-        }
-
-        private void StartLockAnimation()
-        {
-            // 자물쇠 애니메이션
-            Sequence lockAnimation = DOTween.Sequence();
-
-            // 약간의 회전 애니메이션
-            lockAnimation.Append(lockVisual.transform.DOLocalRotate(new Vector3(0, 10, 0), 0.5f).SetEase(Ease.InOutSine));
-            lockAnimation.Append(lockVisual.transform.DOLocalRotate(new Vector3(0, -10, 0), 0.5f).SetEase(Ease.InOutSine));
-            lockAnimation.Append(lockVisual.transform.DOLocalRotate(Vector3.zero, 0.5f).SetEase(Ease.InOutSine));
-
-            // 애니메이션 무한 반복
-            lockAnimation.SetLoops(-1);
-            lockAnimation.Play();
-        }
-
-        private Color GetLockColor(int id)
-        {
-            // 자물쇠 ID에 따른 색상 설정
-            switch (id % 5)
-            {
-                case 0: return new Color(1, 0.8f, 0); // 금색
-                case 1: return new Color(0.8f, 0.8f, 0.8f); // 은색
-                case 2: return new Color(0.6f, 0.3f, 0); // 청동색
-                case 3: return new Color(0, 0.6f, 1); // 파란색
-                case 4: return new Color(1, 0, 0.5f); // 분홍색
-                default: return Color.white;
-            }
-        }
+              
 
         private void SubscribeToKeyEvents()
         {

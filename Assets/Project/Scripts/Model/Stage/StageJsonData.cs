@@ -8,7 +8,7 @@ namespace Project.Scripts.Model
         public int stageIndex;
         public List<BoardBlockData> boardBlocks;
         public List<PlayingBlockData> playingBlocks;
-        public List<WallData> Walls;
+        public List<WallData> walls;
     }
 
     [System.Serializable]

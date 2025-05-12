@@ -3,7 +3,7 @@ using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using Project.Scripts.Data_Script;
+using Project.Scripts.Model;
 
 public class BoardSOCreator : EditorWindow
 {
@@ -94,7 +94,7 @@ public class BoardSOCreator : EditorWindow
         stageData.stageIndex = wrapper.Stage.stageIndex;
         stageData.boardBlocks = wrapper.Stage.boardBlocks;
         stageData.playingBlocks = wrapper.Stage.playingBlocks;
-        stageData.Walls = wrapper.Stage.Walls;
+        stageData.walls = wrapper.Stage.walls;
 
         // 경로 저장
         savePath = fullPath;

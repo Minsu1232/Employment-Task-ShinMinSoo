@@ -1,5 +1,4 @@
 using UnityEngine;
-using DG.Tweening;
 
 namespace Project.Scripts.View
 {
@@ -13,15 +12,9 @@ namespace Project.Scripts.View
         [SerializeField] private MeshRenderer meshRenderer;
         [SerializeField] private GameObject arrowIndicator;
 
-        [Header("효과 설정")]
-        [SerializeField] private float pulseDuration = 1f;
-        [SerializeField] private float pulseIntensity = 0.2f;
-
         private WallObject wallObject;
         private Material defaultMaterial;
         private Color originalColor;
-        private Sequence pulseSequence;
-        private bool isPulsing = false;
 
         private void Awake()
         {
@@ -83,70 +76,15 @@ namespace Project.Scripts.View
         }
 
         /// <summary>
-        /// 벽 펄스 효과 시작
+        /// 벽 파괴 애니메이션 (간단 구현)
         /// </summary>
-        public void StartPulseEffect()
+        public void PlayDestroyAnimation(System.Action onComplete = null)
         {
-            if (isPulsing || meshRenderer == null || meshRenderer.material == null) return;
+            // 간단한 스케일 감소로 파괴 표현
+            transform.localScale = Vector3.zero;
 
-            isPulsing = true;
-
-            // 펄스 애니메이션 시퀀스 생성
-            pulseSequence = DOTween.Sequence();
-
-            Color brightenedColor = new Color(
-                originalColor.r + pulseIntensity,
-                originalColor.g + pulseIntensity,
-                originalColor.b + pulseIntensity,
-                originalColor.a
-            );
-
-            pulseSequence.Append(DOTween.To(() => meshRenderer.material.color, x => meshRenderer.material.color = x, brightenedColor, pulseDuration / 2));
-            pulseSequence.Append(DOTween.To(() => meshRenderer.material.color, x => meshRenderer.material.color = x, originalColor, pulseDuration / 2));
-
-            pulseSequence.SetLoops(-1); // 무한 반복
-            pulseSequence.Play();
-        }
-
-        /// <summary>
-        /// 벽 펄스 효과 중단
-        /// </summary>
-        public void StopPulseEffect()
-        {
-            if (!isPulsing) return;
-
-            if (pulseSequence != null && pulseSequence.IsActive())
-            {
-                pulseSequence.Kill();
-            }
-
-            RestoreOriginalColor();
-            isPulsing = false;
-        }
-
-        /// <summary>
-        /// 벽 파괴 애니메이션
-        /// </summary>
-        public void PlayDestroyAnimation(float duration, System.Action onComplete = null)
-        {
-            // 펄스 효과 중단
-            StopPulseEffect();
-
-            // 스케일 감소 및 페이드 아웃
-            transform.DOScale(Vector3.zero, duration)
-                .SetEase(Ease.InBack)
-                .OnComplete(() => {
-                    onComplete?.Invoke();
-                });
-
-            // 동시에 투명도 감소
-            if (meshRenderer != null && meshRenderer.material != null)
-            {
-                Color startColor = meshRenderer.material.color;
-                Color endColor = new Color(startColor.r, startColor.g, startColor.b, 0);
-
-                DOTween.To(() => startColor, x => meshRenderer.material.color = x, endColor, duration);
-            }
+            // 콜백 실행
+            onComplete?.Invoke();
         }
     }
 }

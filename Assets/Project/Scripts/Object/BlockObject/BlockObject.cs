@@ -1,3 +1,4 @@
+using Project.Scripts.Controller;
 using UnityEngine;
 
 public class BlockObject : MonoBehaviour
@@ -25,15 +26,15 @@ public class BlockObject : MonoBehaviour
 
         /*x = Mathf.Round((transform.position.x + offsetX) / 0.795f);
         y = Mathf.Round((transform.position.z + offsetY) / 0.795f);*/
-        
+
         x = centerPos.x + offsetToCenter.x;
         y = centerPos.y + offsetToCenter.y;
 
         //CheckBelowBoardBlock();
-        
+
         previousPosition = transform.position;
     }
-    
+
     public void CheckBelowBoardBlock(Vector3 destroyStartPos)
     {
         Ray ray = new Ray(transform.position, Vector3.down);
@@ -48,7 +49,7 @@ public class BlockObject : MonoBehaviour
                     preBoardBlockObject.playingBlock = null;
                 }
 
-                if(boardBlock.CheckAdjacentBlock(this, destroyStartPos)) boardBlock.playingBlock = this;
+                if (boardBlock.CheckAdjacentBlock(this, destroyStartPos)) boardBlock.playingBlock = this;
 
                 // 이전 BoardBlockObject 갱신
                 preBoardBlockObject = boardBlock;

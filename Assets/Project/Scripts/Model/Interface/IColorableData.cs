@@ -1,3 +1,5 @@
+using Project.Scripts.Controller;
+
 namespace Project.Scripts.Model
 {
     /// <summary>

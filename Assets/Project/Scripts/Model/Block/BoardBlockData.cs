@@ -1,3 +1,4 @@
+using Project.Scripts.Controller;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,6 +30,14 @@ namespace Project.Scripts.Model
         public void SetIsCheckBlock(bool value)
         {
             isCheckBlock = value;
+        }
+        public enum DestroyWallDirection
+        {
+            None = 0,
+            Up = 1,
+            Down = 2,
+            Left = 3,
+            Right = 4
         }
     }
 }

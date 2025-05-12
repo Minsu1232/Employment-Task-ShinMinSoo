@@ -1,3 +1,4 @@
+using Project.Scripts.Controller;
 using UnityEngine;
 
 namespace Project.Scripts.Model
@@ -5,7 +6,7 @@ namespace Project.Scripts.Model
     [System.Serializable]
     public class BlockData : PositionData, IColorableData
     {
-        [SerializeField] private ColorType colorType;
+        [SerializeField] public ColorType colorType;
 
         public ColorType ColorType { get => colorType; set => colorType = value; }
 

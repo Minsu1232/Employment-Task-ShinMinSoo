@@ -2,6 +2,7 @@ using Project.Scripts.Model;
 using Project.Scripts.View;
 using UnityEngine;
 using DG.Tweening;
+using Project.Scripts.Controller;
 
 namespace Project.Scripts.Presenter
 {

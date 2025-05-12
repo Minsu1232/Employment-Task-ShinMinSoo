@@ -1,3 +1,4 @@
+using Project.Scripts.Controller;
 using UnityEngine;
 
 namespace Project.Scripts.Model

@@ -1,6 +1,6 @@
+using Project.Scripts.Controller;
 using Project.Scripts.Model;
 using UnityEngine;
-
 namespace Project.Scripts.Presenter
 {
     /// <summary>

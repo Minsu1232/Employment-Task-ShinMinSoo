@@ -39,7 +39,7 @@ namespace Project.Scripts.Model
                     stageIndex = this.stageIndex,
                     boardBlocks = this.boardBlocks,
                     playingBlocks = this.playingBlocks,
-                    Walls = this.walls
+                    walls = this.walls
                 }
             };
 
@@ -57,7 +57,7 @@ namespace Project.Scripts.Model
             stageData.stageIndex = wrapper.Stage.stageIndex;
             stageData.boardBlocks = wrapper.Stage.boardBlocks;
             stageData.playingBlocks = wrapper.Stage.playingBlocks;
-            stageData.walls = wrapper.Stage.Walls;
+            stageData.walls = wrapper.Stage.walls;
 
             return stageData;
         }

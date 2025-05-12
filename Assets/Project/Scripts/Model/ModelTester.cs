@@ -1,7 +1,6 @@
 
+using Project.Scripts.Controller;
 using UnityEngine;
-using Unity.VisualScripting;
-using Project.Scripts.Data_Script;
 
 namespace Project.Scrpts.Model
 {

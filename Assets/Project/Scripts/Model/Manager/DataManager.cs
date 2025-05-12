@@ -36,6 +36,7 @@ namespace Project.Scripts.Model
                 instance = this;
                 DontDestroyOnLoad(gameObject);
             }
+           
         }
 
         /// <summary>

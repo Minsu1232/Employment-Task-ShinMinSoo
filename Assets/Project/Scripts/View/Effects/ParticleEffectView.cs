@@ -1,6 +1,7 @@
 using UnityEngine;
+using Project.Scripts.View.Effects;
 
-namespace Project.Scripts.View.Effects
+namespace Project.Scripts.View
 {
     /// <summary>
     /// 파티클 효과를 관리하는 뷰 컴포넌트
@@ -13,6 +14,8 @@ namespace Project.Scripts.View.Effects
 
         [Header("효과 설정")]
         [SerializeField] private float defaultDuration = 1f;
+        [SerializeField] private float defaultScale = 1f;
+        [SerializeField] private Color defaultColor = Color.white;
 
         private void Awake()
         {
@@ -51,7 +54,9 @@ namespace Project.Scripts.View.Effects
             if (mainParticleSystem != null)
             {
                 var main = mainParticleSystem.main;
-                main.startColor = color;
+                var startColor = main.startColor;
+                startColor.color = color;
+                main.startColor = startColor;
             }
         }
 
@@ -63,7 +68,9 @@ namespace Project.Scripts.View.Effects
             if (mainParticleSystem != null)
             {
                 var main = mainParticleSystem.main;
-                main.startSize = size;
+                var startSize = main.startSize;
+                startSize.constant = size;
+                main.startSize = startSize;
             }
         }
 
@@ -95,7 +102,7 @@ namespace Project.Scripts.View.Effects
         }
 
         /// <summary>
-        /// 파티클 효과 실행
+        /// 파티클 효과 재생
         /// </summary>
         public void Play()
         {
@@ -106,6 +113,25 @@ namespace Project.Scripts.View.Effects
                 // 지정된 시간 후 자동 제거
                 Destroy(gameObject, GetEffectDuration());
             }
+        }
+
+        /// <summary>
+        /// 파티클 효과를 특정 위치에서 재생
+        /// </summary>
+        public void PlayAtPosition(Vector3 position)
+        {
+            transform.position = position;
+            Play();
+        }
+
+        /// <summary>
+        /// 파티클 효과를 특정 색상과 크기로 재생
+        /// </summary>
+        public void PlayWithProperties(Color color, float size, Vector3 position)
+        {
+            SetColor(color);
+            SetSize(size);
+            PlayAtPosition(position);
         }
 
         /// <summary>
@@ -126,9 +152,50 @@ namespace Project.Scripts.View.Effects
         {
             if (mainParticleSystem != null)
             {
-                return mainParticleSystem.main.duration + mainParticleSystem.main.startLifetime.constant;
+                var main = mainParticleSystem.main;
+                return main.duration + main.startLifetime.constant;
             }
             return defaultDuration;
+        }
+
+        /// <summary>
+        /// 파티클 스케일 변경
+        /// </summary>
+        public void SetScale(Vector3 scale)
+        {
+            transform.localScale = scale;
+        }
+
+        /// <summary>
+        /// 파티클 발산률 조절
+        /// </summary>
+        public void SetEmissionRate(float rate)
+        {
+            if (mainParticleSystem != null)
+            {
+                var emission = mainParticleSystem.emission;
+                var rateOverTime = emission.rateOverTime;
+                rateOverTime.constant = rate;
+                emission.rateOverTime = rateOverTime;
+            }
+        }
+
+        /// <summary>
+        /// 새 파티클 효과 인스턴스 생성
+        /// </summary>
+        public static ParticleEffectView Spawn(ParticleSystem prefab, Vector3 position, Quaternion rotation)
+        {
+            if (prefab == null) return null;
+
+            ParticleSystem instance = Instantiate(prefab, position, rotation);
+            ParticleEffectView view = instance.GetComponent<ParticleEffectView>();
+
+            if (view == null)
+            {
+                view = instance.gameObject.AddComponent<ParticleEffectView>();
+            }
+
+            return view;
         }
     }
 }

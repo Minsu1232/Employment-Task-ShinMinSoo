@@ -16,6 +16,8 @@ namespace Project.Scripts.View
         [Header("효과 설정")]
         [SerializeField] private float bounceHeight = 0.3f;
         [SerializeField] private float bounceDuration = 0.3f;
+        [SerializeField] private float destroyAnimDuration = 1.0f;
+        [SerializeField] private Ease destroyAnimEase = Ease.Linear;
 
         private BlockObject blockObject;
         private Outline outlineComponent;
@@ -32,6 +34,18 @@ namespace Project.Scripts.View
                 meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
             }
 
+            // 비주얼 루트 설정
+            if (visualRoot == null)
+            {
+                visualRoot = transform.Find("VisualRoot")?.gameObject;
+
+                // 만약 없다면 메시 렌더러가 있는 게임오브젝트를 루트로 사용
+                if (visualRoot == null && meshRenderer != null)
+                {
+                    visualRoot = meshRenderer.gameObject;
+                }
+            }
+
             // 아웃라인 컴포넌트 초기화
             InitializeOutline();
 
@@ -42,6 +56,9 @@ namespace Project.Scripts.View
             }
         }
 
+        /// <summary>
+        /// 아웃라인 컴포넌트 초기화
+        /// </summary>
         private void InitializeOutline()
         {
             outlineComponent = gameObject.GetComponent<Outline>();
@@ -108,7 +125,8 @@ namespace Project.Scripts.View
         {
             if (visualRoot == null)
             {
-                visualRoot = transform;
+                Debug.LogWarning("바운스 애니메이션을 위한 visualRoot가 설정되지 않았습니다.");
+                return;
             }
 
             // 이전 애니메이션 정리
@@ -130,13 +148,31 @@ namespace Project.Scripts.View
         }
 
         /// <summary>
+        /// 블록 강조 효과 재생
+        /// </summary>
+        public void PlayHighlightEffect(Color highlightColor, float duration = 0.5f)
+        {
+            if (meshRenderer == null || meshRenderer.material == null) return;
+
+            // 이미 실행 중인 하이라이트 효과 취소
+            meshRenderer.material.DOKill();
+
+            // 하이라이트 애니메이션 시퀀스
+            DOTween.Sequence()
+                .Append(meshRenderer.material.DOColor(highlightColor, duration / 2))
+                .Append(meshRenderer.material.DOColor(originalColor, duration / 2));
+        }
+
+        /// <summary>
         /// 블록 파괴 애니메이션
         /// </summary>
-        public void PlayDestroyAnimation(Vector3 targetPosition, float duration, System.Action onComplete = null)
+        public void PlayDestroyAnimation(Vector3 targetPosition, float duration = 1.0f, System.Action onComplete = null)
         {
-            // 블록 이동 및 페이드 아웃 애니메이션
-            transform.DOMove(targetPosition, duration)
-                .SetEase(Ease.Linear)
+            float animDuration = (duration > 0) ? duration : destroyAnimDuration;
+
+            // 위치 이동 애니메이션
+            transform.DOMove(targetPosition, animDuration)
+                .SetEase(destroyAnimEase)
                 .OnComplete(() => {
                     onComplete?.Invoke();
                 });
@@ -147,8 +183,50 @@ namespace Project.Scripts.View
                 Color startColor = meshRenderer.material.color;
                 Color endColor = new Color(startColor.r, startColor.g, startColor.b, 0);
 
-                DOTween.To(() => startColor, x => meshRenderer.material.color = x, endColor, duration);
+                DOTween.To(() => startColor, x => meshRenderer.material.color = x, endColor, animDuration);
             }
+        }
+
+        /// <summary>
+        /// 블록 선택 효과 재생
+        /// </summary>
+        public void PlaySelectionEffect()
+        {
+            // 아웃라인 표시
+            ShowOutline(true);
+
+            // 바운스 효과
+            PlayBounceAnimation();
+
+            // 잠시 후 아웃라인 숨김 (게임 요구사항에 따라 조정)
+            Invoke(nameof(HideOutline), 0.5f);
+        }
+
+        /// <summary>
+        /// 아웃라인 숨기기
+        /// </summary>
+        private void HideOutline()
+        {
+            ShowOutline(false);
+        }
+
+        /// <summary>
+        /// 에셋 정리
+        /// </summary>
+        private void OnDestroy()
+        {
+            // 실행 중인 모든 트윈 종료
+            if (bounceSequence != null && bounceSequence.IsActive())
+            {
+                bounceSequence.Kill();
+            }
+
+            if (meshRenderer != null && meshRenderer.material != null)
+            {
+                meshRenderer.material.DOKill();
+            }
+
+            DOTween.Kill(transform);
         }
     }
 }

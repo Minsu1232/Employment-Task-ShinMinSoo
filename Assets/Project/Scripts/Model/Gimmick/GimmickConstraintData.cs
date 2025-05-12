@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Project.Scripts.Model
 {
     /// <summary>
-    /// Á¦¾à ±â¹Í µ¥ÀÌÅÍ Å¬·¡½º
+    /// ¿­¼è ±â¹Í µ¥ÀÌÅÍ Å¬·¡½º
     /// </summary>
     [System.Serializable]
     public class GimmickConstraintData : GimmickData
@@ -12,7 +12,10 @@ namespace Project.Scripts.Model
 
         public bool IsWidth => isWidth;
 
-        public GimmickConstraintData() : base("Constraint") { }
+        public GimmickConstraintData() : base("Constraint")
+        {
+            isWidth = false;
+        }
 
         public GimmickConstraintData(bool isWidth) : base("Constraint")
         {

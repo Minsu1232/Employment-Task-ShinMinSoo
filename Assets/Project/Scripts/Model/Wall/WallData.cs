@@ -1,4 +1,6 @@
+using Project.Scripts.Controller;
 using UnityEngine;
+using static ObjectPropertiesEnum;
 
 namespace Project.Scripts.Model
 {
@@ -7,12 +9,26 @@ namespace Project.Scripts.Model
     {
         [SerializeField] private ObjectPropertiesEnum.WallDirection wallDirection;
         [SerializeField] private int length;
-        [SerializeField] private ColorType wallColor;
+        [SerializeField] public ColorType wallColor;
         [SerializeField] private WallGimmickType wallGimmickType;
 
-        public ObjectPropertiesEnum.WallDirection WallDirection => wallDirection;
-        public int Length => length;
-        public ColorType ColorType { get => wallColor; set => wallColor = value; }
+        public ObjectPropertiesEnum.WallDirection WallDirection
+        {
+            get => wallDirection;
+            set => wallDirection = value;
+        }
+
+        public int Length
+        {
+            get => length;
+            set => length = value;
+        }
+
+        public ColorType ColorType
+        {
+            get => wallColor;
+            set => wallColor = value;
+        }
         public WallGimmickType WallGimmickType => wallGimmickType;
 
         public WallData() : base() { }
@@ -22,7 +38,7 @@ namespace Project.Scripts.Model
             : base(x, y)
         {
             this.wallDirection = direction;
-            this.length = length;
+            this.Length = length;
             this.wallColor = color;
             this.wallGimmickType = gimmickType;
         }
@@ -52,17 +68,17 @@ namespace Project.Scripts.Model
             }
 
             // 길이에 따른 위치 조정
-            if (length > 1)
+            if (Length > 1)
             {
                 if (wallDirection == ObjectPropertiesEnum.WallDirection.Single_Up ||
                     wallDirection == ObjectPropertiesEnum.WallDirection.Single_Down)
                 {
-                    position.x += (length - 1) * gridSize * 0.5f;
+                    position.x += (Length - 1) * gridSize * 0.5f;
                 }
                 else if (wallDirection == ObjectPropertiesEnum.WallDirection.Single_Left ||
                          wallDirection == ObjectPropertiesEnum.WallDirection.Single_Right)
                 {
-                    position.z += (length - 1) * gridSize * 0.5f;
+                    position.z += (Length - 1) * gridSize * 0.5f;
                 }
             }
 

@@ -8,7 +8,7 @@ namespace Project.Scripts.Model
     [System.Serializable]
     public class GimmickData : IGimmickData
     {
-        [SerializeField] private string gimmickType;
+         public string gimmickType;
 
         public string GimmickType { get => gimmickType; set => gimmickType = value; }
 
