@@ -22,7 +22,7 @@ public partial class BoardController
         foreach (var playingBlock in blocks)
         {
             if (playingBlock.x <= pBlockminX) pBlockminX = (int)playingBlock.x;
-            if (playingBlock.y <= pBlockminY) pBlockminY = (int)playingBlock.y;
+            if (playingBlock.y <= pBlockminY) pBlockminY = (int)playingBlock.y; 
             if (playingBlock.x >= pBlockmaxX) pBlockmaxX = (int)playingBlock.x;
             if (playingBlock.y >= pBlockmaxY) pBlockmaxY = (int)playingBlock.y;
         }
