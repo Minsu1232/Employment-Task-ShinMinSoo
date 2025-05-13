@@ -115,19 +115,27 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _RimValue: 0.5
+    - _SliceAmount: 0
+    - _SliceEdgeWidth: 0.02
     - _Smoothness: 0.73
     - _SmoothnessTextureChannel: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
+    - _StencilRef: 0
     - _Surface: 1
     - _UVSec: 0
+    - _UseStencil: 1
     - _WorkflowMode: 1
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 0.9372549, g: 0.59607846, b: 0.30588236, a: 0.8}
+    - _ClipPlaneNormal: {r: 0, g: 0, b: 0, a: 1}
+    - _ClipPlanePos: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 0.9372549, g: 0.5960784, b: 0.30588233, a: 0.8}
     - _EmissionColor: {r: 0.1509434, g: 0.1509434, b: 0.1509434, a: 0}
+    - _SliceDirection: {r: 1, g: 0, b: 0, a: 0}
+    - _SliceEdgeColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -1,399 +1,360 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Project.Scripts.View;
-using Project.Scripts.Controller;
 
-namespace Project.Scripts.View.Effects
+namespace Project.Scripts.View
 {
     /// <summary>
-    /// 스텐실 마스킹 효과를 관리하는 뷰 컴포넌트
+    /// 스텐실 버퍼 기반 효과를 관리하는 클래스
     /// </summary>
-    public class StencilMaskView : MonoBehaviour
+    public class StencilMaskView
     {
-        [Header("스텐실 쉐이더 참조")]
-        [SerializeField] private Material stencilMaskMaterial;    // 마스크 작성 머티리얼
-        [SerializeField] private Material stencilUseMaterial;     // 마스크 사용 머티리얼
+        // 셰이더 머티리얼
+        private Material wallStencilWriterMaterial;
+        private Material blockSlicingMaterial;
 
-        [Header("스텐실 설정")]
-        [SerializeField] private int stencilRef = 1;              // 스텐실 참조값
-        [SerializeField] private float vertexOffset = 0.01f;      // 버텍스 확장 값
+        // 스텐실 설정
+        private int stencilRefValue = 1;
 
-        [Header("디버그 설정")]
-        [SerializeField] private bool showDebugMesh = false;      // 디버그 메시 표시 여부
-
-        private List<Renderer> maskWriters = new List<Renderer>(); // 마스크를 쓰는 렌더러들
-        private List<Renderer> maskUsers = new List<Renderer>();   // 마스크를 사용하는 렌더러들
-
-        // 원본 머티리얼 저장용 딕셔너리
+        // 원본 머티리얼 저장
         private Dictionary<Renderer, Material> originalMaterials = new Dictionary<Renderer, Material>();
 
-        private void Awake()
+        // 슬라이싱 데이터
+        private class SlicingData
         {
-            // 스텐실 머티리얼이 없는 경우 기본 머티리얼 생성
-            if (stencilMaskMaterial == null || stencilUseMaterial == null)
+            public GameObject target;
+            public List<Material> materials = new List<Material>();
+            public float amount;
+            public float speed;
+            public System.Action onComplete;
+
+            public SlicingData(GameObject obj, float spd, System.Action callback)
             {
-                CreateDefaultStencilMaterials();
-            }
-        }
-        /// <summary>
-        /// 뷰 초기화
-        /// </summary>
-        /// <param name="camera">메인 카메라</param>
-        /// <param name="material">스텐실 마스크 재질</param>
-        public void Initialize(Camera camera, Material material)
-        {
-            // 카메라와 머티리얼 설정
-            this.stencilMaskMaterial = material;
-
-            // 쿼드 메시 생성
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
-
-            // 메시 생성 및 설정
-            Mesh quadMesh = CreateQuadMesh();
-            meshFilter.mesh = quadMesh;
-
-            // 스텐실 마스크 머티리얼 설정
-            meshRenderer.material = this.stencilMaskMaterial;
-
-            // 마스크 작성자 목록에 추가
-            maskWriters.Add(meshRenderer);
-
-            // 머티리얼에 스텐실 참조값 설정
-            if (this.stencilMaskMaterial != null)
-            {
-                this.stencilMaskMaterial.SetInt("_StencilRef", stencilRef);
+                target = obj;
+                speed = spd;
+                onComplete = callback;
+                amount = 0f;
             }
         }
 
-        /// <summary>
-        /// 쿼드 메시 생성
-        /// </summary>
-        private Mesh CreateQuadMesh()
-        {
-            Mesh mesh = new Mesh();
-            float size = 0.79f / 2; // 블록 크기의 절반
+        // 슬라이싱 중인 오브젝트 추적
+        private Dictionary<GameObject, SlicingData> slicingObjects = new Dictionary<GameObject, SlicingData>();
 
-            // 정점 (사각형)
-            Vector3[] vertices = new Vector3[4]
-            {
-        new Vector3(-size, 0, -size), // 왼쪽 아래
-        new Vector3(size, 0, -size),  // 오른쪽 아래
-        new Vector3(size, 0, size),   // 오른쪽 위
-        new Vector3(-size, 0, size)   // 왼쪽 위
-            };
-
-            // 삼각형 (두 개의 삼각형으로 쿼드 구성)
-            int[] triangles = new int[6]
-            {
-        0, 1, 2,
-        0, 2, 3
-            };
-
-            // 법선 (위쪽 방향)
-            Vector3[] normals = new Vector3[4]
-            {
-        Vector3.up,
-        Vector3.up,
-        Vector3.up,
-        Vector3.up
-            };
-
-            // UV 좌표
-            Vector2[] uv = new Vector2[4]
-            {
-        new Vector2(0, 0),
-        new Vector2(1, 0),
-        new Vector2(1, 1),
-        new Vector2(0, 1)
-            };
-
-            mesh.vertices = vertices;
-            mesh.triangles = triangles;
-            mesh.normals = normals;
-            mesh.uv = uv;
-            mesh.RecalculateBounds();
-
-            return mesh;
-        }
-        /// <summary>
-        /// 기본 스텐실 머티리얼 생성
-        /// </summary>
-        private void CreateDefaultStencilMaterials()
-        {
-            // 마스크 작성 머티리얼 생성
-            Shader maskShader = Shader.Find("Custom/StencilMask");
-            if (maskShader != null)
-            {
-                stencilMaskMaterial = new Material(maskShader);
-                stencilMaskMaterial.SetInt("_StencilRef", stencilRef);
-                stencilMaskMaterial.SetFloat("_VertexOffset", vertexOffset);
-            }
-            else
-            {
-                Debug.LogError("스텐실 마스크 쉐이더를 찾을 수 없습니다.");
-            }
-
-            // 마스크 사용 머티리얼 생성
-            Shader useShader = Shader.Find("Custom/StencilUse");
-            if (useShader != null)
-            {
-                stencilUseMaterial = new Material(useShader);
-                stencilUseMaterial.SetInt("_StencilRef", stencilRef);
-            }
-            else
-            {
-                Debug.LogError("스텐실 사용 쉐이더를 찾을 수 없습니다.");
-            }
-        }
+        // MonoBehaviour 참조 (코루틴 실행용)
+        private MonoBehaviour coroutineHost;
 
         /// <summary>
-        /// 스텐실 마스킹 설정
+        /// 초기화
         /// </summary>
-        public void SetupStencilMasking(List<GameObject> maskWriterObjects, List<GameObject> maskUserObjects)
+        public void Initialize(MonoBehaviour host, Material wallWriter, Material blockSlicing = null)
         {
-            // 기존 설정 초기화
-            ClearMaskingSetup();
+            coroutineHost = host;
+            wallStencilWriterMaterial = wallWriter;
+            blockSlicingMaterial = blockSlicing;
 
-            // 마스크 작성 오브젝트 설정
-            if (maskWriterObjects != null)
+            // 머티리얼이 없는 경우 기본 셰이더로 생성
+            if (blockSlicingMaterial == null)
             {
-                foreach (var obj in maskWriterObjects)
+                Shader slicingShader = Shader.Find("Custom/BlockSlicingShader");
+                if (slicingShader != null)
                 {
-                    if (obj != null)
+                    blockSlicingMaterial = new Material(slicingShader);
+                }
+            }
+
+            // 스텐실 참조값 설정
+            SetStencilRef(1);
+        }
+
+        /// <summary>
+        /// 스텐실 참조값 설정
+        /// </summary>
+        // 스텐실 참조값 설정 메서드 수정
+        public void SetStencilRef(int value)
+        {
+            stencilRefValue = value;
+
+            // 머티리얼에 참조값 설정
+            if (wallStencilWriterMaterial != null)
+            {
+                wallStencilWriterMaterial.SetInt("_StencilRef", stencilRefValue);
+            }
+
+            if (blockSlicingMaterial != null)
+            {
+                blockSlicingMaterial.SetInt("_StencilRef", stencilRefValue);
+            }
+        }
+
+        // 스텐실 마스킹 설정 메서드 수정
+        public void SetupStencilMasking(List<GameObject> walls, List<GameObject> blocks)
+        {
+            // 기존 설정 정리 (슬라이싱 중인 블록 제외)
+            CleanupMaterials(false);
+
+            // 벽 오브젝트에 스텐실 Writer 적용
+            foreach (var wall in walls)
+            {
+                ApplyStencilWriterToObject(wall);
+            }
+
+            // 블록에는 스텐실 효과를 적용하지 않음 (슬라이싱 시에만 적용)
+        }
+
+        /// <summary>
+        /// 벽 오브젝트에 스텐실 Writer 적용
+        /// </summary>
+        private void ApplyStencilWriterToObject(GameObject obj)
+        {
+            if (wallStencilWriterMaterial == null) return;
+
+            // 메인 벽 Renderer만 찾기 (자식 오브젝트 제외)
+            Renderer renderer = obj.GetComponent<Renderer>();
+
+            // 렌더러가 없으면 WallObject에서 찾기
+            if (renderer == null)
+            {
+                WallObject wallObj = obj.GetComponent<WallObject>();
+                if (wallObj != null)
+                {
+                    // WallObject에서 메인 렌더러 참조 가져오기
+                    renderer = wallObj.GetMainRenderer();
+                }
+            }
+
+            if (renderer != null)
+            {
+                // 원본 머티리얼 저장
+                if (!originalMaterials.ContainsKey(renderer))
+                {
+                    originalMaterials.Add(renderer, renderer.material);
+                }
+
+                // 스텐실 Writer 머티리얼 인스턴스 생성
+                Material material = new Material(wallStencilWriterMaterial);
+
+                // 원본 텍스처와 색상 복사
+                if (originalMaterials[renderer].mainTexture != null)
+                {
+                    material.mainTexture = originalMaterials[renderer].mainTexture;
+                }
+                material.color = originalMaterials[renderer].color;
+
+                // 머티리얼 적용
+                renderer.material = material;
+            }
+        }
+   
+
+        /// <summary>
+        /// 블록 슬라이싱 효과 시작
+        /// </summary>
+        public void StartBlockSlicing(GameObject blockObj, Vector3 sliceDirection, float speed = 1.0f, System.Action onComplete = null)
+        {
+            if (blockObj == null || blockSlicingMaterial == null || coroutineHost == null) return;
+
+            // 이미 슬라이싱 중인 블록이면 중단
+            if (slicingObjects.ContainsKey(blockObj))
+            {
+                return;
+            }
+
+            // 슬라이싱 데이터 생성
+            SlicingData sliceData = new SlicingData(blockObj, speed, onComplete);
+            slicingObjects.Add(blockObj, sliceData);
+
+            // 블록에 슬라이싱 머티리얼 적용
+            ApplySlicingMaterialToBlock(blockObj, sliceDirection, sliceData);
+
+            // 슬라이싱 애니메이션 시작
+            coroutineHost.StartCoroutine(AnimateSlicing(blockObj));
+        }
+        /// <summary>
+        /// 블록에 슬라이싱 머티리얼 적용
+        /// </summary>
+        private void ApplySlicingMaterialToBlock(GameObject blockObj, Vector3 sliceDirection, SlicingData sliceData)
+        {
+            // 블록의 모든 렌더러 찾기
+            Renderer[] renderers = blockObj.GetComponentsInChildren<Renderer>();
+
+            foreach (var renderer in renderers)
+            {
+                if (renderer == null) continue;
+
+                // 원본 머티리얼 저장
+                if (!originalMaterials.ContainsKey(renderer))
+                {
+                    originalMaterials.Add(renderer, renderer.material);
+                }
+
+                // 원본 머티리얼 참조
+                Material originalMat = originalMaterials[renderer];
+
+                // 슬라이싱 머티리얼 인스턴스 생성
+                Material sliceMaterial = new Material(blockSlicingMaterial);
+
+                // 원본 텍스처 복사
+                if (originalMat.HasProperty("_MainTex") && originalMat.mainTexture != null)
+                {
+                    sliceMaterial.SetTexture("_MainTex", originalMat.mainTexture);
+                }
+
+                // URP 텍스처 복사 (필요한 경우)
+                if (originalMat.HasProperty("_BaseMap") && originalMat.GetTexture("_BaseMap") != null)
+                {
+                    sliceMaterial.SetTexture("_MainTex", originalMat.GetTexture("_BaseMap"));
+                }
+
+                // 원본 색상 복사
+                if (originalMat.HasProperty("_Color"))
+                {
+                    sliceMaterial.SetColor("_Color", originalMat.GetColor("_Color"));
+                }
+
+                // URP 색상 복사 (필요한 경우)
+                if (originalMat.HasProperty("_BaseColor"))
+                {
+                    sliceMaterial.SetColor("_Color", originalMat.GetColor("_BaseColor"));
+                }
+
+                // 슬라이싱 파라미터 설정
+                sliceMaterial.SetVector("_SliceDirection", new Vector4(sliceDirection.x, sliceDirection.y, sliceDirection.z, 0));
+                sliceMaterial.SetFloat("_SliceAmount", 0f);
+
+                // 머티리얼 적용
+                renderer.material = sliceMaterial;
+                sliceData.materials.Add(sliceMaterial);
+            }
+        }
+        /// <summary>
+        /// 슬라이싱 애니메이션
+        /// </summary>
+        private IEnumerator AnimateSlicing(GameObject blockObj)
+        {
+            if (!slicingObjects.ContainsKey(blockObj))
+            {
+                yield break;
+            }
+
+            SlicingData sliceData = slicingObjects[blockObj];
+
+            // 슬라이싱 애니메이션
+            while (sliceData.amount < 1.0f)
+            {
+                // 블록이 파괴된 경우 중단
+                if (blockObj == null)
+                {
+                    slicingObjects.Remove(blockObj);
+                    yield break;
+                }
+
+                // 슬라이싱 진행
+                sliceData.amount += Time.deltaTime * sliceData.speed;
+                sliceData.amount = Mathf.Clamp01(sliceData.amount);
+
+                // 모든 머티리얼 업데이트
+                foreach (var material in sliceData.materials)
+                {
+                    if (material != null)
                     {
-                        Renderer renderer = obj.GetComponent<Renderer>();
-                        if (renderer != null)
-                        {
-                            // 원본 머티리얼 저장
-                            if (!originalMaterials.ContainsKey(renderer))
-                            {
-                                originalMaterials.Add(renderer, renderer.material);
-                            }
-
-                            // 스텐실 마스크 머티리얼 적용
-                            renderer.material = new Material(stencilMaskMaterial);
-
-                            // 원본 텍스처 및 색상 복사
-                            if (originalMaterials[renderer].mainTexture != null)
-                            {
-                                renderer.material.mainTexture = originalMaterials[renderer].mainTexture;
-                            }
-                            renderer.material.color = originalMaterials[renderer].color;
-
-                            maskWriters.Add(renderer);
-                        }
+                        material.SetFloat("_SliceAmount", sliceData.amount);
                     }
                 }
+
+                yield return null;
             }
 
-            // 마스크 사용 오브젝트 설정
-            if (maskUserObjects != null)
+            // 애니메이션 완료 후 콜백 호출
+            if (sliceData.onComplete != null)
             {
-                foreach (var obj in maskUserObjects)
+                sliceData.onComplete.Invoke();
+            }
+
+            // 슬라이싱 목록에서 제거
+            slicingObjects.Remove(blockObj);
+        }
+
+        /// <summary>
+        /// 방향에 따른 슬라이싱 방향 계산
+        /// </summary>
+        public Vector3 CalculateSliceDirection(LaunchDirection direction)
+        {
+            switch (direction)
+            {
+                case LaunchDirection.Up:
+                    return Vector3.forward;
+                case LaunchDirection.Down:
+                    return Vector3.back;
+                case LaunchDirection.Left:
+                    return Vector3.left;
+                case LaunchDirection.Right:
+                    return Vector3.right;
+                default:
+                    return Vector3.up;
+            }
+        }
+
+        /// <summary>
+        /// 머티리얼 정리
+        /// </summary>
+        public void CleanupMaterials(bool includeSlicing = true)
+        {
+            List<Renderer> restoreList = new List<Renderer>();
+
+            foreach (var pair in originalMaterials)
+            {
+                if (pair.Key == null) continue;
+
+                bool shouldRestore = true;
+
+                // 슬라이싱 중인 오브젝트는 제외
+                if (!includeSlicing)
                 {
-                    if (obj != null)
+                    GameObject rendererObj = pair.Key.gameObject;
+                    Transform parent = rendererObj.transform;
+
+                    // 부모 계층 확인
+                    while (parent != null)
                     {
-                        Renderer renderer = obj.GetComponent<Renderer>();
-                        if (renderer != null)
+                        if (slicingObjects.ContainsKey(parent.gameObject))
                         {
-                            // 원본 머티리얼 저장
-                            if (!originalMaterials.ContainsKey(renderer))
-                            {
-                                originalMaterials.Add(renderer, renderer.material);
-                            }
-
-                            // 투명도 처리 여부에 따라 다른 쉐이더 사용
-                            Material newMaterial;
-                            if (originalMaterials[renderer].HasProperty("_Mode") &&
-                                originalMaterials[renderer].GetFloat("_Mode") > 0) // 투명 재질
-                            {
-                                newMaterial = new Material(Shader.Find("Custom/StencilUseTransparent"));
-                            }
-                            else // 불투명 재질
-                            {
-                                newMaterial = new Material(stencilUseMaterial);
-                            }
-
-                            // 원본 텍스처 및 색상 복사
-                            if (originalMaterials[renderer].mainTexture != null)
-                            {
-                                newMaterial.mainTexture = originalMaterials[renderer].mainTexture;
-                            }
-                            newMaterial.color = originalMaterials[renderer].color;
-                            newMaterial.SetInt("_StencilRef", stencilRef);
-
-                            // 스텐실 사용 머티리얼 적용
-                            renderer.material = newMaterial;
-                            maskUsers.Add(renderer);
+                            shouldRestore = false;
+                            break;
                         }
+                        parent = parent.parent;
                     }
                 }
+
+                if (shouldRestore)
+                {
+                    pair.Key.material = pair.Value;
+                    restoreList.Add(pair.Key);
+                }
+            }
+
+            // 복원된 렌더러 제거
+            foreach (var renderer in restoreList)
+            {
+                originalMaterials.Remove(renderer);
+            }
+
+            // 슬라이싱 객체 정리
+            if (includeSlicing)
+            {
+                slicingObjects.Clear();
             }
         }
 
         /// <summary>
-        /// 마스킹 설정 초기화
+        /// 완전히 정리
         /// </summary>
-        public void ClearMaskingSetup()
+        public void Cleanup()
         {
-            // 원본 머티리얼로 복원
-            foreach (var renderer in maskWriters)
+            CleanupMaterials(true);
+
+            if (coroutineHost != null)
             {
-                if (renderer != null && originalMaterials.ContainsKey(renderer))
-                {
-                    renderer.material = originalMaterials[renderer];
-                }
-            }
-
-            foreach (var renderer in maskUsers)
-            {
-                if (renderer != null && originalMaterials.ContainsKey(renderer))
-                {
-                    renderer.material = originalMaterials[renderer];
-                }
-            }
-
-            maskWriters.Clear();
-            maskUsers.Clear();
-        }
-
-        /// <summary>
-        /// 스텐실 참조값 변경
-        /// </summary>
-        public void SetStencilReferenceValue(int value)
-        {
-            stencilRef = value;
-
-            if (stencilMaskMaterial != null)
-            {
-                stencilMaskMaterial.SetInt("_StencilRef", stencilRef);
-            }
-
-            if (stencilUseMaterial != null)
-            {
-                stencilUseMaterial.SetInt("_StencilRef", stencilRef);
-            }
-
-            // 이미 적용된 머티리얼에도 새 참조값 적용
-            foreach (var renderer in maskWriters)
-            {
-                if (renderer != null && renderer.material != null)
-                {
-                    renderer.material.SetInt("_StencilRef", stencilRef);
-                }
-            }
-
-            foreach (var renderer in maskUsers)
-            {
-                if (renderer != null && renderer.material != null)
-                {
-                    renderer.material.SetInt("_StencilRef", stencilRef);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 보드 영역에 대한 스텐실 마스크 메시 생성
-        /// </summary>
-        public void CreateBoardStencilMask(Dictionary<(int x, int y), BoardBlockObject> boardBlockDic, float blockDistance)
-        {
-            if (boardBlockDic.Count == 0) return;
-
-            // 스텐실 마스크 오브젝트 생성
-            GameObject maskObj = new GameObject("BoardStencilMask");
-            maskObj.transform.SetParent(transform);
-
-            MeshFilter meshFilter = maskObj.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = maskObj.AddComponent<MeshRenderer>();
-
-            // 스텐실 마스크 머티리얼 설정
-            meshRenderer.material = stencilMaskMaterial;
-
-            // 보드 영역 메시 생성
-            Mesh mesh = CreateBoardMesh(boardBlockDic, blockDistance);
-            meshFilter.mesh = mesh;
-
-            // 디버그 모드 설정
-            if (showDebugMesh)
-            {
-                meshRenderer.material = new Material(Shader.Find("Standard"));
-                meshRenderer.material.color = new Color(1, 1, 0, 0.5f);
-            }
-
-            // 마스크 작성자 목록에 추가
-            maskWriters.Add(meshRenderer);
-        }
-
-        /// <summary>
-        /// 보드 영역 메시 생성
-        /// </summary>
-        private Mesh CreateBoardMesh(Dictionary<(int x, int y), BoardBlockObject> boardBlockDic, float blockDistance)
-        {
-            Mesh mesh = new Mesh();
-            List<Vector3> vertices = new List<Vector3>();
-            List<int> triangles = new List<int>();
-            List<Vector3> normals = new List<Vector3>();
-
-            float yPos = 0.01f; // 약간 올려서 겹침 방지
-            float halfSize = blockDistance * 0.5f;
-
-            int vertIndex = 0;
-
-            // 각 보드 블록 위치에 대해 쿼드 생성
-            foreach (var pos in boardBlockDic.Keys)
-            {
-                float x = pos.x * blockDistance;
-                float z = pos.y * blockDistance;
-
-                // 쿼드 정점 (사각형)
-                vertices.Add(new Vector3(x - halfSize, yPos, z - halfSize)); // 왼쪽 아래
-                vertices.Add(new Vector3(x + halfSize, yPos, z - halfSize)); // 오른쪽 아래
-                vertices.Add(new Vector3(x + halfSize, yPos, z + halfSize)); // 오른쪽 위
-                vertices.Add(new Vector3(x - halfSize, yPos, z + halfSize)); // 왼쪽 위
-
-                // 법선 (위쪽 방향)
-                for (int i = 0; i < 4; i++)
-                {
-                    normals.Add(Vector3.up);
-                }
-
-                // 삼각형 (두 개의 삼각형으로 쿼드 구성)
-                triangles.Add(vertIndex);
-                triangles.Add(vertIndex + 1);
-                triangles.Add(vertIndex + 2);
-
-                triangles.Add(vertIndex);
-                triangles.Add(vertIndex + 2);
-                triangles.Add(vertIndex + 3);
-
-                vertIndex += 4;
-            }
-
-            mesh.vertices = vertices.ToArray();
-            mesh.triangles = triangles.ToArray();
-            mesh.normals = normals.ToArray();
-            mesh.RecalculateBounds();
-
-            return mesh;
-        }
-
-        /// <summary>
-        /// 자원 정리
-        /// </summary>
-        private void OnDestroy()
-        {
-            ClearMaskingSetup();
-
-            // 스텐실 머티리얼 정리
-            if (stencilMaskMaterial != null)
-            {
-                Destroy(stencilMaskMaterial);
-            }
-
-            if (stencilUseMaterial != null)
-            {
-                Destroy(stencilUseMaterial);
+                coroutineHost.StopAllCoroutines();
             }
         }
     }

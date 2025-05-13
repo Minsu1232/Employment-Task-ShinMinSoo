@@ -1,5 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
+using Project.Scripts.Controller;
+using Project.Scripts.Config;
 
 namespace Project.Scripts.View
 {
@@ -24,6 +26,10 @@ namespace Project.Scripts.View
         private Color originalColor;
         private Sequence bounceSequence;
 
+        private Material dissolveMaterial;
+        private Material originalMaterial;
+        private bool isDissolving = false;
+        private Tween dissolveTween;
         private void Awake()
         {
             blockObject = GetComponent<BlockObject>();
@@ -95,32 +101,7 @@ namespace Project.Scripts.View
                 outlineComponent.enabled = show;
             }
         }
-
-        /// <summary>
-        /// 블록 색상 변경
-        /// </summary>
-        public void SetColor(Color color)
-        {
-            if (meshRenderer != null && meshRenderer.material != null)
-            {
-                meshRenderer.material.color = color;
-            }
-        }
-
-        /// <summary>
-        /// 원래 색상으로 복원
-        /// </summary>
-        public void RestoreOriginalColor()
-        {
-            if (meshRenderer != null && meshRenderer.material != null)
-            {
-                meshRenderer.material.color = originalColor;
-            }
-        }
-
-        /// <summary>
-        /// 블록 바운스 효과
-        /// </summary>
+           
         public void PlayBounceAnimation()
         {
             if (visualRoot == null)
@@ -145,71 +126,8 @@ namespace Project.Scripts.View
             bounceSequence.Append(visualRoot.transform.DOLocalMove(originalPosition, bounceDuration / 2).SetEase(Ease.InQuad));
 
             bounceSequence.Play();
-        }
-
-        /// <summary>
-        /// 블록 강조 효과 재생
-        /// </summary>
-        public void PlayHighlightEffect(Color highlightColor, float duration = 0.5f)
-        {
-            if (meshRenderer == null || meshRenderer.material == null) return;
-
-            // 이미 실행 중인 하이라이트 효과 취소
-            meshRenderer.material.DOKill();
-
-            // 하이라이트 애니메이션 시퀀스
-            DOTween.Sequence()
-                .Append(meshRenderer.material.DOColor(highlightColor, duration / 2))
-                .Append(meshRenderer.material.DOColor(originalColor, duration / 2));
-        }
-
-        /// <summary>
-        /// 블록 파괴 애니메이션
-        /// </summary>
-        public void PlayDestroyAnimation(Vector3 targetPosition, float duration = 1.0f, System.Action onComplete = null)
-        {
-            float animDuration = (duration > 0) ? duration : destroyAnimDuration;
-
-            // 위치 이동 애니메이션
-            transform.DOMove(targetPosition, animDuration)
-                .SetEase(destroyAnimEase)
-                .OnComplete(() => {
-                    onComplete?.Invoke();
-                });
-
-            // 동시에 투명도 감소
-            if (meshRenderer != null && meshRenderer.material != null)
-            {
-                Color startColor = meshRenderer.material.color;
-                Color endColor = new Color(startColor.r, startColor.g, startColor.b, 0);
-
-                DOTween.To(() => startColor, x => meshRenderer.material.color = x, endColor, animDuration);
-            }
-        }
-
-        /// <summary>
-        /// 블록 선택 효과 재생
-        /// </summary>
-        public void PlaySelectionEffect()
-        {
-            // 아웃라인 표시
-            ShowOutline(true);
-
-            // 바운스 효과
-            PlayBounceAnimation();
-
-            // 잠시 후 아웃라인 숨김 (게임 요구사항에 따라 조정)
-            Invoke(nameof(HideOutline), 0.5f);
-        }
-
-        /// <summary>
-        /// 아웃라인 숨기기
-        /// </summary>
-        private void HideOutline()
-        {
-            ShowOutline(false);
-        }
-
+        }        
+     
         /// <summary>
         /// 에셋 정리
         /// </summary>
@@ -224,6 +142,12 @@ namespace Project.Scripts.View
             if (meshRenderer != null && meshRenderer.material != null)
             {
                 meshRenderer.material.DOKill();
+            }
+
+            // 디졸브 트윈 정리
+            if (dissolveTween != null && dissolveTween.IsActive())
+            {
+                dissolveTween.Kill();
             }
 
             DOTween.Kill(transform);

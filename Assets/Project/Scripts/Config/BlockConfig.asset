@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 647b438739a4ede4b8ec27542a283fd3, type: 3}
+  m_Name: BlockConfig
+  m_EditorClassIdentifier: 
+  blockGroupPrefab: {fileID: 4246495902434896490, guid: 213c0d67944d44e89822c258b3000264,
+    type: 3}
+  blockPrefab: {fileID: 3816581106366051946, guid: f663cb86b09084a0d98668b5483cc849,
+    type: 3}
+  blockMaterials:
+  - {fileID: 2100000, guid: c80dd3717919b304f94b1178afb19b9f, type: 2}
+  - {fileID: 2100000, guid: ba07ec26b6400e443b9287204b473b79, type: 2}
+  - {fileID: 2100000, guid: 027fb7e82052f7f4eb35958101d4de14, type: 2}
+  - {fileID: 2100000, guid: 9a9a4fef4fc166342901a58eaf8ab2a4, type: 2}
+  - {fileID: 2100000, guid: 3489af5dd34b98a46a6aaf3c2863e523, type: 2}
+  - {fileID: 2100000, guid: 4b1c0b9038f3d3c439a0cb15173dc2d2, type: 2}
+  - {fileID: 2100000, guid: 33d3f21ff4fb1544482a59880b5810d5, type: 2}
+  - {fileID: 2100000, guid: a4ca989e9729d0043aca1a1a0ac4f068, type: 2}
+  - {fileID: 2100000, guid: b8d122da05dd72947a3c90065818df5c, type: 2}
+  testBlockMaterials:
+  - {fileID: 2100000, guid: 9539a791e2d84f241b76730496431b37, type: 2}
+  - {fileID: 2100000, guid: 8513d8cac09c04f37b43b99fd7b1ebe4, type: 2}
+  - {fileID: 2100000, guid: ffb36e49712de45acbea5e0fb9c69dee, type: 2}
+  - {fileID: 2100000, guid: 8c9ab924fabac4912b2059451c5e3213, type: 2}
+  - {fileID: 2100000, guid: 85ba27da62d4542839d8ba809ba73a8d, type: 2}
+  - {fileID: 2100000, guid: 68628aaa39e03457a82d97f7ff100d38, type: 2}
+  - {fileID: 2100000, guid: df796f81d98414506beda08861c78d83, type: 2}
+  - {fileID: 2100000, guid: 3911ad6b37d8e4f01ac79f81fe095ca5, type: 2}
+  - {fileID: 2100000, guid: 16ba0ebe467b6440a9dfb0b23ad0da42, type: 2}
+  maxSpeed: 20
+  moveSpeed: 25
+  followSpeed: 30
+  collisionResetTime: 0.1

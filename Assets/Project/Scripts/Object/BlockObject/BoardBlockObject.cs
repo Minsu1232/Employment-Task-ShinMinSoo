@@ -61,6 +61,7 @@ namespace Project.Scripts.Controller
 
         public bool CheckAdjacentBlock(BlockObject block, Vector3 destroyStartPos)
         {
+            
             if (!isCheckBlock) return false;
             if (!block.dragHandler.enabled) return false;
 
@@ -137,92 +138,25 @@ namespace Project.Scripts.Controller
                             rotation = Quaternion.Euler(0, -90, 0);
                             break;
                     }
-
-                    int blockLength = isHorizon[i] ? block.dragHandler.horizon : block.dragHandler.vertical;
-
-                    // 파티클 프리팹 가져오기
-                    ParticleSystem particlePrefab = OnGetDestroyParticle != null
-                        ? OnGetDestroyParticle()
-                        : null;
-
-                    if (particlePrefab != null)
+                    BlockDestroyManager blockDestroyManager = StageController.Instance.GetBlockDestroyManager();
+                    if (blockDestroyManager != null)
                     {
-                        // 파티클 설정
-                        ParticleSystem[] pss = particlePrefab.GetComponentsInChildren<ParticleSystem>();
-                        foreach (var ps in pss)
-                        {
-                            ParticleSystemRenderer psrs = ps.GetComponent<ParticleSystemRenderer>();
-                            // 재질 가져오기 이벤트 사용
-                            if (OnGetMaterial != null)
-                            {
-                                psrs.material = OnGetMaterial((int)block.colorType);
-                            }
-                        }
-
-                        // 파티클 생성
-                        ParticleSystem particle = Instantiate(particlePrefab, transform.position, rotation);
-                        particle.transform.position = centerPos;
-                        particle.transform.localScale = new Vector3(blockLength * 0.4f, 0.5f, blockLength * 0.4f);
-
-                        // 보드 블록 뷰에 파괴 효과 적용
-                        if (boardBlockView != null)
-                        {
-                            boardBlockView.PlayDestroyEffect();
-                        }
-
-                        // 파괴 애니메이션 실행 (View를 통해 실행)
-                        BlockView blockView = block.GetComponent<BlockView>();
-                        if (blockView != null)
-                        {
-                            blockView.PlayDestroyAnimation(pos, 1f, () => {
-                                if (particle != null)
-                                {
-                                    Destroy(particle.gameObject);
-                                }
-
-                                if (block.dragHandler != null)
-                                {
-                                    block.dragHandler.OnBlockDestroyed?.Invoke(block);
-                                    Destroy(block.dragHandler.gameObject);
-                                }
-                            });
-                        }
-                        else
-                        {
-                            // View가 없는 경우 기존 로직 사용
-                            block.dragHandler.DestroyMove(pos, particle);
-                        }
+                        blockDestroyManager.DestroyBlockWithEffect(
+                            block,
+                            pos,              // 이동 목표 위치
+                            centerPos,        // 효과 생성 위치 
+                            direction,        // 발사 방향
+                            block.colorType,   // 블록 색상
+                            rotation
+                        );
                     }
+
 
                     return true;
                 }
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// 블록을 놓을 때 배치 가능 여부를 시각적으로 표시합니다.
-        /// </summary>
-        public void ShowPlacementIndicator(BlockObject block, bool canPlace)
-        {
-            if (boardBlockView != null)
-            {
-                boardBlockView.ShowPlacementIndicator(canPlace);
-
-                // 체크 블록인 경우, 색상 매칭 표시
-                if (isCheckBlock && canPlace)
-                {
-                    for (int i = 0; i < colorType.Count; i++)
-                    {
-                        if (block.colorType == colorType[i])
-                        {
-                            boardBlockView.ShowDestroyableIndicator(true, block.colorType);
-                            return;
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>

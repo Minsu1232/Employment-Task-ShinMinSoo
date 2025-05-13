@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b38e768a52d1a24418c9a037c60fe477, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  stageDatas:
+  - {fileID: 11400000, guid: fc7f2580c87d5354993643a9c969b55b, type: 2}
+  boardConfig: {fileID: 11400000, guid: 3b200803551114e4a95e788d85bc3065, type: 2}
+  blockConfig: {fileID: 11400000, guid: 07c90e39652833f43807f768984c7456, type: 2}
+  wallConfig: {fileID: 11400000, guid: d8ffc0afc97b57c49adb3c6e501126b7, type: 2}
+  visualConfig: {fileID: 11400000, guid: 08fdbf714cd1aba45b6993db9e66c019, type: 2}
+  gameEvents: {fileID: 11400000, guid: 34a93a482cc18c4449fac79ead89873b, type: 2}

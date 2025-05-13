@@ -337,6 +337,7 @@ GameObject:
   - component: {fileID: 3197205242250341373}
   - component: {fileID: 4458697015707937746}
   - component: {fileID: -6573339705410717959}
+  - component: {fileID: -5747421768845041686}
   m_Layer: 0
   m_Name: Jelly Cube
   m_TagString: Untagged
@@ -425,6 +426,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-5747421768845041686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3816581106366051946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7febde956fa6861429a913d564ffbee4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 0}
+  visualRoot: {fileID: 0}
+  bounceHeight: 0.3
+  bounceDuration: 0.3
+  destroyAnimDuration: 1
+  destroyAnimEase: 1
 --- !u!1 &4598736002310258185
 GameObject:
   m_ObjectHideFlags: 0

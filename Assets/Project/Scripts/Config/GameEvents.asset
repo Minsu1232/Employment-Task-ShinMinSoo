@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a85b547ae2572f4f8c454f7ab224406, type: 3}
+  m_Name: GameEvents
+  m_EditorClassIdentifier: 
+  onGameStart: {fileID: 0}
+  onGamePause: {fileID: 0}
+  onGameResume: {fileID: 0}
+  onGameOver: {fileID: 0}
+  onStageLoad: {fileID: 11400000, guid: 5072c5317d890b94d8932ad118e5abcb, type: 2}
+  onStageComplete: {fileID: 11400000, guid: c0d1d88c8ca7c814dab5047ef939bcf9, type: 2}
+  onBlockDestroy: {fileID: 11400000, guid: aabd644baf264b5468c003b683f52284, type: 2}
+  onCheckDestroy: {fileID: 11400000, guid: 6f001ec1c8c2baf4e9a37031f8762678, type: 2}
+  onBlockDragStart: {fileID: 11400000, guid: 13f3fe5844f0498439a2fda493d54bc0, type: 2}
+  onBlockDragEnd: {fileID: 11400000, guid: 13f3fe5844f0498439a2fda493d54bc0, type: 2}
+  onBlockDrop: {fileID: 11400000, guid: d5f2e882f251bba41b1bcfa1f2e8845e, type: 2}

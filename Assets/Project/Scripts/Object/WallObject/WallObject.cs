@@ -18,7 +18,11 @@ public class WallObject : MonoBehaviour
             wallView = gameObject.AddComponent<WallView>();
         }
     }
-
+    public Renderer GetMainRenderer()
+    {
+        // 메인 벽 렌더러 반환 (화살표 제외)
+        return GetComponent<Renderer>();
+    }
     public void SetWall(Material material, bool isCuttingBox)
     {
         // 기본 렌더러 설정

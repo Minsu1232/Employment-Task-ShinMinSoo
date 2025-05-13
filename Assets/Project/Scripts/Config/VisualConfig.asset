@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1862cc14206b0084cacd6c687cb74eb4, type: 3}
+  m_Name: VisualConfig
+  m_EditorClassIdentifier: 
+  destroyParticlePrefab: {fileID: 8198912971446300596, guid: ec90d8fe09a08634eb07d7df50754492,
+    type: 3}
+  dissolveEdgeColor: {r: 1, g: 0.5, b: 0, a: 1}
+  dissolveEdgeWidth: 0.05
+  dissolveDuration: 1
+  vertexStencilDissolveMaterial: {fileID: 2100000, guid: 55d3a6f1174282840a63b1af76b20343,
+    type: 2}
+  stencilRefValue: 1
+  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  outlineWidth: 2

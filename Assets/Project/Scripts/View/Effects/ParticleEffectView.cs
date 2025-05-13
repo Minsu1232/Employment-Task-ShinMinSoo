@@ -1,5 +1,5 @@
 using UnityEngine;
-using Project.Scripts.View.Effects;
+using DG.Tweening;
 
 namespace Project.Scripts.View
 {
@@ -14,35 +14,39 @@ namespace Project.Scripts.View
 
         [Header("효과 설정")]
         [SerializeField] private float defaultDuration = 1f;
-        [SerializeField] private float defaultScale = 1f;
         [SerializeField] private Color defaultColor = Color.white;
 
-        private void Awake()
+        // 초기화 메서드
+        public void Initialize(Material material = null, Color? color = null)
         {
-            // 파티클 시스템 참조 찾기
+            // 파티클 시스템 참조 확인
             if (mainParticleSystem == null)
-            {
                 mainParticleSystem = GetComponent<ParticleSystem>();
-            }
 
-            // 렌더러 참조 찾기
+            // 렌더러 참조 확인
             if (particleRenderers == null || particleRenderers.Length == 0)
-            {
                 particleRenderers = GetComponentsInChildren<ParticleSystemRenderer>();
-            }
+
+            // 재질 설정
+            if (material != null)
+                SetMaterial(material);
+
+            // 색상 설정
+            if (color.HasValue)
+                SetColor(color.Value);
         }
 
         /// <summary>
-        /// 파티클 머티리얼 설정
+        /// 파티클 재질 설정
         /// </summary>
         public void SetMaterial(Material material)
         {
-            if (particleRenderers != null)
+            if (particleRenderers == null || material == null) return;
+
+            foreach (var renderer in particleRenderers)
             {
-                foreach (var renderer in particleRenderers)
-                {
+                if (renderer != null)
                     renderer.material = material;
-                }
             }
         }
 
@@ -51,27 +55,18 @@ namespace Project.Scripts.View
         /// </summary>
         public void SetColor(Color color)
         {
-            if (mainParticleSystem != null)
-            {
-                var main = mainParticleSystem.main;
-                var startColor = main.startColor;
-                startColor.color = color;
-                main.startColor = startColor;
-            }
+            if (mainParticleSystem == null) return;
+
+            var main = mainParticleSystem.main;
+            main.startColor = new ParticleSystem.MinMaxGradient(color);
         }
 
         /// <summary>
         /// 파티클 크기 설정
         /// </summary>
-        public void SetSize(float size)
+        public void SetScale(Vector3 scale)
         {
-            if (mainParticleSystem != null)
-            {
-                var main = mainParticleSystem.main;
-                var startSize = main.startSize;
-                startSize.constant = size;
-                main.startSize = startSize;
-            }
+            transform.localScale = scale;
         }
 
         /// <summary>
@@ -79,70 +74,53 @@ namespace Project.Scripts.View
         /// </summary>
         public void SetDirection(Vector3 direction)
         {
-            if (mainParticleSystem != null)
-            {
-                var shape = mainParticleSystem.shape;
-                if (shape.enabled)
-                {
-                    shape.rotation = Quaternion.LookRotation(direction).eulerAngles;
-                }
-            }
-        }
+            if (mainParticleSystem == null) return;
 
-        /// <summary>
-        /// 파티클 지속 시간 설정
-        /// </summary>
-        public void SetDuration(float duration)
-        {
-            if (mainParticleSystem != null)
+            var shape = mainParticleSystem.shape;
+            if (shape.enabled)
             {
-                var main = mainParticleSystem.main;
-                main.duration = duration;
+                shape.rotation = Quaternion.LookRotation(direction).eulerAngles;
             }
         }
 
         /// <summary>
         /// 파티클 효과 재생
         /// </summary>
-        public void Play()
+        public void Play(float duration = 0f)
         {
-            if (mainParticleSystem != null)
-            {
-                mainParticleSystem.Play();
+            if (mainParticleSystem == null) return;
 
-                // 지정된 시간 후 자동 제거
-                Destroy(gameObject, GetEffectDuration());
+            // 지속 시간 설정
+            if (duration > 0)
+            {
+                var main = mainParticleSystem.main;
+                main.duration = duration;
             }
+
+            // 파티클 재생
+            mainParticleSystem.Play();
+
+            // 지정된 시간 후 자동 제거
+            float actualDuration = duration > 0 ? duration : GetEffectDuration();
+            Destroy(gameObject, actualDuration + 0.5f); // 여유 시간 추가
         }
 
         /// <summary>
         /// 파티클 효과를 특정 위치에서 재생
         /// </summary>
-        public void PlayAtPosition(Vector3 position)
+        public void PlayAtPosition(Vector3 position, float duration = 0f)
         {
             transform.position = position;
-            Play();
+            Play(duration);
         }
 
         /// <summary>
-        /// 파티클 효과를 특정 색상과 크기로 재생
-        /// </summary>
-        public void PlayWithProperties(Color color, float size, Vector3 position)
-        {
-            SetColor(color);
-            SetSize(size);
-            PlayAtPosition(position);
-        }
-
-        /// <summary>
-        /// 파티클 효과 정지
+        /// 파티클 효과 종료
         /// </summary>
         public void Stop()
         {
             if (mainParticleSystem != null)
-            {
                 mainParticleSystem.Stop();
-            }
         }
 
         /// <summary>
@@ -156,46 +134,6 @@ namespace Project.Scripts.View
                 return main.duration + main.startLifetime.constant;
             }
             return defaultDuration;
-        }
-
-        /// <summary>
-        /// 파티클 스케일 변경
-        /// </summary>
-        public void SetScale(Vector3 scale)
-        {
-            transform.localScale = scale;
-        }
-
-        /// <summary>
-        /// 파티클 발산률 조절
-        /// </summary>
-        public void SetEmissionRate(float rate)
-        {
-            if (mainParticleSystem != null)
-            {
-                var emission = mainParticleSystem.emission;
-                var rateOverTime = emission.rateOverTime;
-                rateOverTime.constant = rate;
-                emission.rateOverTime = rateOverTime;
-            }
-        }
-
-        /// <summary>
-        /// 새 파티클 효과 인스턴스 생성
-        /// </summary>
-        public static ParticleEffectView Spawn(ParticleSystem prefab, Vector3 position, Quaternion rotation)
-        {
-            if (prefab == null) return null;
-
-            ParticleSystem instance = Instantiate(prefab, position, rotation);
-            ParticleEffectView view = instance.GetComponent<ParticleEffectView>();
-
-            if (view == null)
-            {
-                view = instance.gameObject.AddComponent<ParticleEffectView>();
-            }
-
-            return view;
         }
     }
 }
