@@ -90,9 +90,10 @@ namespace Project.Scripts.View
         /// <summary>
         /// 스텐실 마스킹 설정
         /// </summary>
+       
         public void SetupStencilMasking(List<GameObject> walls, List<GameObject> blocks)
         {
-            // 기존 설정 정리 (클리핑 중인 블록 제외)
+            // 기존 설정 정리
             CleanupMaterials(false);
 
             // 벽 오브젝트에 스텐실 Writer 적용
@@ -100,14 +101,57 @@ namespace Project.Scripts.View
             {
                 ApplyStencilWriterToObject(wall);
             }
-        }
 
+            // 블록에 스텐실 Reader 설정 적용
+            foreach (var block in blocks)
+            {
+                PrepareBlockForStencilReading(block);
+            }
+        }
+        /// <summary>
+        /// 블록에 스텐실 읽기 설정 적용
+        /// </summary>
+        public void PrepareBlockForStencilReading(GameObject blockObj)
+        {
+            if (blockObj == null || blockStencilReaderMaterial == null) return;
+
+            // 블록의 모든 렌더러 찾기
+            Renderer[] renderers = blockObj.GetComponentsInChildren<Renderer>();
+
+            foreach (var renderer in renderers)
+            {
+                if (renderer == null) continue;
+
+                // 원본 머티리얼에 이미 스텐실 설정이 적용된 경우 스킵
+                if (renderer.material.shader.name.Contains("BlockStencilReader"))
+                    continue;
+
+                // 원본 머티리얼 저장
+                if (!originalMaterials.ContainsKey(renderer))
+                {
+                    originalMaterials.Add(renderer, renderer.material);
+                }
+
+                // 스텐실 리더 머티리얼 생성 및 적용
+                Material stencilMaterial = new Material(blockStencilReaderMaterial);
+
+                // 스텐실 참조값 설정
+                stencilMaterial.SetInt("_StencilRef", stencilRefValue);
+
+                // 렌더러에 머티리얼 적용
+                renderer.material = stencilMaterial;
+            }
+        }
         /// <summary>
         /// 벽 오브젝트에 스텐실 Writer 적용
         /// </summary>
         private void ApplyStencilWriterToObject(GameObject obj)
         {
             if (wallStencilWriterMaterial == null) return;
+
+            // Board 레이어인 경우 스킵
+            if (obj.layer == LayerMask.NameToLayer("Board"))
+                return;
 
             // 메인 벽 Renderer만 찾기
             Renderer renderer = obj.GetComponent<Renderer>();

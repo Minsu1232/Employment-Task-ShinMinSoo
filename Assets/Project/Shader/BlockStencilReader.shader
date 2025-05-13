@@ -36,11 +36,15 @@ Shader"Custom/BlockStencilReader"
 LOD 300
         
         // 스텐실 설정은 주석 처리 (필요 없음)
-        // Stencil 
-        // {
-        //     Ref [_StencilRef]
-        //     Comp NotEqual 
-        // }
+         Stencil
+{
+    Ref[_StencilRef]
+    Comp
+    NotEqual // 원래대로 NotEqual 유지
+    Pass
+    Keep
+
+}
         
         // Blend 모드 설정
         Blend[_SrcBlend][_DstBlend]
@@ -167,13 +171,17 @@ half4 frag(Varyings input) : SV_Target
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
                 
-                // 클리핑 플레인 처리
+                
+  // 클리핑 플레인 처리와 스텐실 테스트 조합
+  // 클리핑 평면 Tolerance 추가
     float3 planePos = _ClipPlanePos.xyz;
     float3 planeNormal = normalize(_ClipPlaneNormal.xyz);
     float dist = dot(input.positionWS - planePos, planeNormal);
-                
-                // 벽 너머 부분은 렌더링하지 않음
-    clip(dist);
+    
+    // 클리핑에 미세한 여유 추가
+    float clipTolerance = 0.005f;
+    clip(dist + clipTolerance); // 약간의 여유 추가
+
                 
                 // 텍스처 및 색상
     float2 uv = input.uv;

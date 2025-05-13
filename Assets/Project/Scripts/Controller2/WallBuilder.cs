@@ -240,9 +240,11 @@ namespace Project.Scripts.Controller
                 if (wall != null)
                 {
                     wall.SetWall(wallMaterials[(int)wallData.wallColor], wallData.wallColor != ColorType.None);
+
                 }
 
                 walls.Add(wallObj);
+
             }
             else
             {

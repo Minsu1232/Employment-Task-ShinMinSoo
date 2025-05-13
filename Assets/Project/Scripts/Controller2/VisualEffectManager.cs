@@ -125,7 +125,7 @@ namespace Project.Scripts.View
             walls.Clear();
             walls.AddRange(wallObjects);
 
-            // 스텐실 마스크 설정 업데이트
+            // 스텐실 마스크 설정 (벽과 블록 모두 등록)
             if (vertexStencilEffectView != null)
             {
                 vertexStencilEffectView.SetupStencilMasking(walls, blocks);
@@ -159,6 +159,19 @@ namespace Project.Scripts.View
 
             // 블록에 클리핑 효과 적용
             vertexStencilEffectView.ApplyClippingToBlock(block, wallPosition, clipNormal);
+        }
+        /// <summary>
+        /// 블록에 스텐실 읽기 설정 적용
+        /// </summary>
+        public void PrepareBlocksForStencilReading(List<GameObject> blocks)
+        {
+            if (vertexStencilEffectView == null) return;
+
+            // 버텍스 스텐실 효과에 블록 전달
+            foreach (var block in blocks)
+            {
+                vertexStencilEffectView.PrepareBlockForStencilReading(block);
+            }
         }
         /// <summary>
         /// 파괴 파티클 반환 (이벤트 핸들러)

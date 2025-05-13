@@ -29,8 +29,14 @@ LOD 300
         Stencil
 {
     Ref[_StencilRef]
-            Comp Always
-            Pass Replace
+    Comp
+    Always
+    Pass
+    Replace // 명시적으로 Replace 사용 (벽 영역에 스텐실 값 쓰기)
+    Fail
+    Keep
+    ZFail
+    Keep // Z 테스트 실패 시 스텐실 유지
 
 }
         
