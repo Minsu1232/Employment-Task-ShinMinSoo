@@ -130,21 +130,41 @@ namespace Project.Scripts.Editor
 
         #endregion
 
-        
 
-   
 
-      
+
+
+
 
         #region JSON 변환
 
         private void ExportToJson()
         {
-            if (string.IsNullOrEmpty(jsonFilePath))
+            // 파일 경로 지정 (직접 파일 저장 대화상자 표시)
+            string defaultDirectory = Path.Combine(Application.dataPath, "Project/Resource/Data/Json");
+
+            // 폴더가 없으면 생성
+            if (!Directory.Exists(defaultDirectory))
             {
-                EditorUtility.DisplayDialog("오류", "파일 경로를 입력해주세요.", "확인");
+                Directory.CreateDirectory(defaultDirectory);
+            }
+
+            // SaveFilePanel을 사용하여 사용자가 직접 경로 선택
+            string fileName = $"Stage_{currentStage.stageIndex}.json";
+            string selectedPath = EditorUtility.SaveFilePanel(
+                "JSON 파일 저장",
+                defaultDirectory,
+                fileName,
+                "json");
+
+            // 사용자가 취소했으면 종료
+            if (string.IsNullOrEmpty(selectedPath))
+            {
                 return;
             }
+
+            // 선택된 경로 저장
+            jsonFilePath = selectedPath;
 
             // 현재 스테이지 데이터 업데이트
             currentStage.boardBlocks = boardBlocks;
@@ -171,11 +191,28 @@ namespace Project.Scripts.Editor
             try
             {
                 File.WriteAllText(jsonFilePath, json);
-                EditorUtility.DisplayDialog("내보내기 완료", $"JSON 파일을 성공적으로 저장했습니다:\n{jsonFilePath}", "확인");
+
+                // 성공 메시지와 함께 경로 표시
+                string displayPath = jsonFilePath;
+                if (jsonFilePath.StartsWith(Application.dataPath))
+                {
+                    // 상대 경로로 표시 (Assets/로 시작하는 형식)
+                    displayPath = "Assets" + jsonFilePath.Substring(Application.dataPath.Length);
+                }
+
+                EditorUtility.DisplayDialog("내보내기 완료",
+                    $"JSON 파일이 저장되었습니다.\n\n경로: {displayPath}", "확인");
+
+                // 에셋 데이터베이스 갱신 (유니티 에셋 폴더에 저장된 경우)
+                if (jsonFilePath.StartsWith(Application.dataPath))
+                {
+                    AssetDatabase.Refresh();
+                }
             }
             catch (Exception e)
             {
-                EditorUtility.DisplayDialog("오류", $"파일 저장 중 오류가 발생했습니다:\n{e.Message}", "확인");
+                EditorUtility.DisplayDialog("오류",
+                    $"파일 저장 중 오류가 발생했습니다:\n{e.Message}\n\n경로: {jsonFilePath}", "확인");
             }
         }
 

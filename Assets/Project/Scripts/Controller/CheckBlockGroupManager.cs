@@ -240,8 +240,7 @@ namespace Project.Scripts.Controller
         /// 보드 크기 반환 (이벤트 핸들러)
         /// </summary>
         private Vector2Int GetBoardSize()
-        {
-            Debug.Log(new Vector2Int(boardWidth, boardHeight));
+        {            
             return new Vector2Int(boardWidth, boardHeight);
         }
 
@@ -250,6 +249,7 @@ namespace Project.Scripts.Controller
         /// </summary>
         public bool CheckCanDestroy(BoardBlockObject boardBlock, BlockObject block)
         {
+            Debug.Log("시작");
             // 유효성 검사 - 그룹 인덱스 확인
             foreach (var checkGroupIdx in boardBlock.checkGroupIdx)
             {
@@ -268,14 +268,14 @@ namespace Project.Scripts.Controller
 
             List<BlockObject> blocks = block.dragHandler.blocks;
 
-            foreach (var playingBlock in blocks)
-            {
-                if (playingBlock.x <= pBlockminX) pBlockminX = (int)playingBlock.x;
-                if (playingBlock.y <= pBlockminY) pBlockminY = (int)playingBlock.y;
-                if (playingBlock.x >= pBlockmaxX) pBlockmaxX = (int)playingBlock.x;
-                if (playingBlock.y >= pBlockmaxY) pBlockmaxY = (int)playingBlock.y;
-            }
-
+     foreach (var playingBlock in blocks)
+{
+    if (playingBlock.x <= pBlockminX) pBlockminX = (int)playingBlock.x;
+    if (playingBlock.y <= pBlockminY) pBlockminY = (int)playingBlock.y; 
+    if (playingBlock.x >= pBlockmaxX) pBlockmaxX = (int)playingBlock.x;
+    if (playingBlock.y >= pBlockmaxY) pBlockmaxY = (int)playingBlock.y;
+}
+Debug.Log($"[PBlock 범위] minX: {pBlockminX}, maxX: {pBlockmaxX}, minY: {pBlockminY}, maxY: {pBlockmaxY}");
             // 방향별 체크 블록 분류
             List<BoardBlockObject> horizonBoardBlocks = new List<BoardBlockObject>();
             List<BoardBlockObject> verticalBoardBlocks = new List<BoardBlockObject>();
@@ -299,11 +299,12 @@ namespace Project.Scripts.Controller
             // 색상이 일치하지 않으면 파괴 불가
             if (matchingIndex == -1)
             {
+                Debug.Log("여기!@!@");
                 return false;
             }
 
             bool hor = boardBlock.isHorizon[matchingIndex];
-
+            Debug.Log(hor);
             // 가로 방향 체크
             if (hor)
             {
@@ -417,104 +418,96 @@ namespace Project.Scripts.Controller
                 {
                     if (coordinate.y < minY) minY = (int)coordinate.y;
                     if (coordinate.y > maxY) maxY = (int)coordinate.y;
+                }
 
-                    // 블록이 경계를 벗어나면 파괴 불가
-                    if (pBlockminY < minY - blockDistance / 2 || pBlockmaxY > maxY + blockDistance / 2)
+                float lowerBound = minY - blockDistance / 2f;
+                float upperBound = maxY + blockDistance / 2f;
+
+                Debug.Log($"[조건 검사] pBlockminY={pBlockminY}, lowerBound={lowerBound}, 결과: {pBlockminY < lowerBound}");
+                Debug.Log($"[조건 검사] pBlockmaxY={pBlockmaxY}, upperBound={upperBound}, 결과: {pBlockmaxY > upperBound}");
+
+                if (pBlockminY < lowerBound || pBlockmaxY > upperBound)
+                {
+                    Debug.Log("여기서 펄스");
+                    return false;
+                }
+
+                (int, int)[] blockCheckCoors = new (int, int)[verticalBoardBlocks.Count];
+
+                for (int i = 0; i < verticalBoardBlocks.Count; i++)
+                {
+                    //x exist in left
+                    if (verticalBoardBlocks[i].x <= boardWidth / 2)
                     {
-                        return false;
-                    }
+                        int maxX = int.MinValue;
 
-                    // 각 체크 위치별 검사
-                    (int, int)[] blockCheckCoors = new (int, int)[verticalBoardBlocks.Count];
-
-                    for (int i = 0; i < verticalBoardBlocks.Count; i++)
-                    {
-                        // 보드 중심의 왼쪽
-                        if (verticalBoardBlocks[i].x <= boardWidth / 2)
+                        for (int k = 0; k < block.dragHandler.blocks.Count; k++)
                         {
-                            int maxX = int.MinValue;
+                            var currentBlock = block.dragHandler.blocks[k];
 
-                            // 플레이어 블록 중 체크 블록과 같은 y좌표를 가진 블록 찾기
-                            for (int k = 0; k < block.dragHandler.blocks.Count; k++)
+                            if (currentBlock.y == verticalBoardBlocks[i].y)
                             {
-                                var currentBlock = block.dragHandler.blocks[k];
-
-                                if (currentBlock.y == verticalBoardBlocks[i].y)
+                                if (currentBlock.x > maxX)
                                 {
-                                    if (currentBlock.x > maxX)
-                                    {
-                                        maxX = (int)currentBlock.x;
-                                    }
-                                }
-                            }
-
-                            // 튜플에 y와 maxX를 저장
-                            blockCheckCoors[i] = (maxX, (int)verticalBoardBlocks[i].y);
-
-                            // 경로 상의 모든 블록 확인
-                            for (int l = blockCheckCoors[i].Item1; l >= verticalBoardBlocks[i].x; l--)
-                            {
-                                if (blockCheckCoors[i].Item2 < pBlockminY || blockCheckCoors[i].Item2 > pBlockmaxY)
-                                {
-                                    continue;
-                                }
-
-                                (int, int) key = (l, blockCheckCoors[i].Item2);
-
-                                // 경로상 다른 색상의 블록이 있으면 파괴 불가
-                                if (boardBlockDic.ContainsKey(key) &&
-                                    boardBlockDic[key].playingBlock != null &&
-                                    boardBlockDic[key].playingBlock.colorType != boardBlock.verticalColorType)
-                                {
-                                    return false;
+                                    maxX = (int)currentBlock.x;
                                 }
                             }
                         }
-                        // 보드 중심의 오른쪽
-                        else
+
+                        // 튜플에 y와 maxX를 저장
+                        blockCheckCoors[i] = (maxX, (int)verticalBoardBlocks[i].y);
+
+                        for (int l = blockCheckCoors[i].Item1; l >= verticalBoardBlocks[i].x; l--)
                         {
-                            int minX = 100;
+                            if (blockCheckCoors[i].Item2 < pBlockminY || blockCheckCoors[i].Item2 > pBlockmaxY)
+                                continue;
+                            (int, int) key = (l, blockCheckCoors[i].Item2);
 
-                            // 플레이어 블록 중 체크 블록과 같은 y좌표를 가진 블록 찾기
-                            for (int k = 0; k < block.dragHandler.blocks.Count; k++)
+                            if (boardBlockDic.ContainsKey(key) &&
+                                boardBlockDic[key].playingBlock != null &&
+                                boardBlockDic[key].playingBlock.colorType != boardBlock.verticalColorType)
                             {
-                                var currentBlock = block.dragHandler.blocks[k];
+                                return false;
+                            }
+                        }
+                    }
+                    //x exist in right
+                    else
+                    {
+                        int minX = 100;
 
-                                if (currentBlock.y == verticalBoardBlocks[i].y)
+                        for (int k = 0; k < block.dragHandler.blocks.Count; k++)
+                        {
+                            var currentBlock = block.dragHandler.blocks[k];
+
+                            if (currentBlock.y == verticalBoardBlocks[i].y)
+                            {
+                                if (currentBlock.x < minX)
                                 {
-                                    if (currentBlock.x < minX)
-                                    {
-                                        minX = (int)currentBlock.x;
-                                    }
+                                    minX = (int)currentBlock.x;
                                 }
                             }
+                        }
 
-                            // 튜플에 y와 minX를 저장
-                            blockCheckCoors[i] = (minX, (int)verticalBoardBlocks[i].y);
+                        // 튜플에 y와 minX를 저장
+                        blockCheckCoors[i] = (minX, (int)verticalBoardBlocks[i].y);
 
-                            // 경로 상의 모든 블록 확인
-                            for (int l = blockCheckCoors[i].Item1; l <= verticalBoardBlocks[i].x; l++)
+                        for (int l = blockCheckCoors[i].Item1; l <= verticalBoardBlocks[i].x; l++)
+                        {
+                            if (blockCheckCoors[i].Item2 < pBlockminY || blockCheckCoors[i].Item2 > pBlockmaxY)
+                                continue;
+                            (int, int) key = (l, blockCheckCoors[i].Item2);
+
+                            if (boardBlockDic.ContainsKey(key) &&
+                                boardBlockDic[key].playingBlock != null &&
+                                boardBlockDic[key].playingBlock.colorType != boardBlock.verticalColorType)
                             {
-                                if (blockCheckCoors[i].Item2 < pBlockminY || blockCheckCoors[i].Item2 > pBlockmaxY)
-                                {
-                                    continue;
-                                }
-
-                                (int, int) key = (l, blockCheckCoors[i].Item2);
-
-                                // 경로상 다른 색상의 블록이 있으면 파괴 불가
-                                if (boardBlockDic.ContainsKey(key) &&
-                                    boardBlockDic[key].playingBlock != null &&
-                                    boardBlockDic[key].playingBlock.colorType != boardBlock.verticalColorType)
-                                {
-                                    return false;
-                                }
+                                return false;
                             }
                         }
                     }
                 }
             }
-
             return true;
         }
 

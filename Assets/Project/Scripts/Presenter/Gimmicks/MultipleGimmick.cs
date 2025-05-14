@@ -46,23 +46,23 @@ namespace Project.Scripts.Presenter
             visualIndicator.transform.SetParent(targetObject.transform);
             visualIndicator.transform.localPosition = new Vector3(0, 0.1f, 0);
 
-            // 블록 뷰 컴포넌트 가져오기
-            BlockView blockView = targetObject.GetComponentInChildren<BlockView>();
-            if (blockView != null)
-            {
-                SkinnedMeshRenderer renderer = blockView.GetComponentInChildren<SkinnedMeshRenderer>();
-                if (renderer != null)
-                {
-                    originalMaterial = renderer.material;
+            //// 블록 뷰 컴포넌트 가져오기
+            //BlockView blockView = targetObject.GetComponentInChildren<BlockView>();
+            //if (blockView != null)
+            //{
+            //    SkinnedMeshRenderer renderer = blockView.GetComponentInChildren<SkinnedMeshRenderer>();
+            //    if (renderer != null)
+            //    {
+            //        originalMaterial = renderer.material;
 
-                    // 다중 색상 효과를 위한 새 머티리얼 생성
-                    multipleMaterial = new Material(originalMaterial);
-                    multipleMaterial.color = GetColorForType(targetColorType);
+            //        // 다중 색상 효과를 위한 새 머티리얼 생성
+            //        multipleMaterial = new Material(originalMaterial);
+            //        multipleMaterial.color = GetColorForType(targetColorType);
 
-                    // 색상 변화 효과 시작
-                    StartColorPulseEffect(renderer);
-                }
-            }
+            //        // 색상 변화 효과 시작
+            //        StartColorPulseEffect(renderer);
+            //    }
+            //}
         }
 
         private void StartColorPulseEffect(Renderer renderer)

@@ -191,11 +191,11 @@ namespace Project.Scripts.Editor
                 switch (e.keyCode)
                 {
                     case KeyCode.UpArrow:
-                        moveDirection = new Vector2Int(0, -1);
+                        moveDirection = new Vector2Int(0, 1);
                         moved = true;
                         break;
                     case KeyCode.DownArrow:
-                        moveDirection = new Vector2Int(0, 1);
+                        moveDirection = new Vector2Int(0, -1);
                         moved = true;
                         break;
                     case KeyCode.LeftArrow:

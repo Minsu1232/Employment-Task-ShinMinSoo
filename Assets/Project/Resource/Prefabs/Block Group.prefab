@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: -6434855438647393059}
   - component: {fileID: -7652566893894775010}
   - component: {fileID: -7422079546453452776}
-  - component: {fileID: 3420933422495490164}
   m_Layer: 0
   m_Name: Block Group
   m_TagString: Untagged
@@ -122,15 +121,3 @@ MonoBehaviour:
   maxSpeed: 20
   moveSpeed: 25
   followSpeed: 30
---- !u!114 &3420933422495490164
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4246495902434896490}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3aad2e9b552a594288758b9a98e9ed6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

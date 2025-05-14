@@ -50,14 +50,12 @@ namespace Project.Scripts.Controller
                     if (isHorizon[i])
                     {
                         if (block.dragHandler.horizon > len[i])
-                        {
-                            
+                        {                            
                             return false;
                         }
                         // 이벤트 호출로 변경
                         if (OnCheckDestroy == null || !OnCheckDestroy(this, block))
-                        {
-                            
+                        {                            
                             return false;
                         }
                         length = block.dragHandler.vertical;
@@ -66,7 +64,7 @@ namespace Project.Scripts.Controller
                     {
                         if (block.dragHandler.vertical > len[i])
                         {
-                           
+                            Debug.Log(block.dragHandler.vertical);
                             return false;
                         }
                         // 이벤트 호출로 변경

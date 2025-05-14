@@ -235,18 +235,6 @@ MonoBehaviour:
     length: 6
     wallColor: 0
     wallGimmickType: 0
-  - x: 7
-    y: 1
-    wallDirection: 4
-    length: 4
-    wallColor: 2
-    wallGimmickType: 0
-  - x: 7
-    y: 5
-    wallDirection: 4
-    length: 1
-    wallColor: 0
-    wallGimmickType: 0
   - x: 2
     y: 1
     wallDirection: 3
@@ -281,6 +269,12 @@ MonoBehaviour:
     y: 5
     wallDirection: 1
     length: 2
+    wallColor: 2
+    wallGimmickType: 0
+  - x: 7
+    y: 1
+    wallDirection: 4
+    length: 5
     wallColor: 2
     wallGimmickType: 0
   checkGroups: []
