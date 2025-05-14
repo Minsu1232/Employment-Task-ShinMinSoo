@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Project.Scripts.Config;
 using static Project.Scripts.Model.BoardBlockData;
+using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 namespace Project.Scripts.Controller
 {
@@ -33,9 +34,9 @@ namespace Project.Scripts.Controller
         public async Task<Dictionary<(int x, int y), Dictionary<(DestroyWallDirection, ColorType), int>>> CreateCustomWalls(
             int stageIdx, GameObject boardParent)
         {
+            Debug.Log($"Stage {stageIdx} - 벽 데이터 개수: {gameConfig.stageDatas[stageIdx].walls.Count}");
             if (stageIdx < 0 || stageIdx >= gameConfig.stageDatas.Length || gameConfig.stageDatas[stageIdx].walls == null)
-            {
-                Debug.LogError($"유효하지 않은 스테이지 인덱스이거나 벽 데이터가 없습니다: {stageIdx}");
+            {               
                 return new Dictionary<(int x, int y), Dictionary<(DestroyWallDirection, ColorType), int>>();
             }
 
@@ -157,8 +158,7 @@ namespace Project.Scripts.Controller
                 default:
                     Debug.LogError($"지원되지 않는 벽 방향: {wallData.WallDirection}");
                     return;
-            }
-
+            }    
             // 벽 정보 추가
             if (shouldAddWallInfo && wallData.wallColor != ColorType.None)
             {
@@ -245,11 +245,7 @@ namespace Project.Scripts.Controller
 
                 walls.Add(wallObj);
 
-            }
-            else
-            {
-                Debug.LogError($"프리팹 인덱스 범위를 벗어남: {wallData.Length - 1}, 사용 가능한 프리팹: 0-{wallPrefabs.Length - 1}");
-            }
+            }           
         }
 
         /// <summary>

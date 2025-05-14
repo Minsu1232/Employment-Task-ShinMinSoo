@@ -5,7 +5,8 @@ using Project.Scripts.Model;
 using System.Collections.Generic;
 using System;
 using Project.Scripts.Controller;
- 
+using static ObjectPropertiesEnum;
+
 namespace Project.Scripts.Editor
 {
     public partial class StageEditorWindow
@@ -247,7 +248,7 @@ namespace Project.Scripts.Editor
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("↑", GUILayout.Width(40), GUILayout.Height(24)))
                 {
-                    MoveSelectedBlock(0, -1); // 위로 이동
+                    MoveSelectedBlock(0, 1); // 위로 이동
                 }
                 GUILayout.FlexibleSpace();
                 EditorGUILayout.EndHorizontal();
@@ -270,7 +271,7 @@ namespace Project.Scripts.Editor
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("↓", GUILayout.Width(40), GUILayout.Height(24)))
                 {
-                    MoveSelectedBlock(0, 1); // 아래로 이동
+                    MoveSelectedBlock(0, -1); // 아래로 이동
                 }
                 GUILayout.FlexibleSpace();
                 EditorGUILayout.EndHorizontal();
@@ -279,12 +280,12 @@ namespace Project.Scripts.Editor
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("왼쪽으로 회전", GUILayout.Height(24)))
                 {
-                    RotateSelectedBlock(true); // 왼쪽(반시계) 회전
+                    RotateSelectedBlock(false); // 왼쪽 회전
                 }
 
                 if (GUILayout.Button("오른쪽으로 회전", GUILayout.Height(24)))
                 {
-                    RotateSelectedBlock(false); // 오른쪽(시계) 회전
+                    RotateSelectedBlock(true); // 오른쪽 회전
                 }
                 EditorGUILayout.EndHorizontal();
 
@@ -341,6 +342,60 @@ namespace Project.Scripts.Editor
 
             EditorGUILayout.Space(10);
 
+            // 현재 선택된 벽 정보 (플레이 블록과 동일한 방식)
+            if (currentWallIndex >= 0 && currentWallIndex < walls.Count)
+            {
+                var selectedWall = walls[currentWallIndex];
+                EditorGUILayout.LabelField("선택된 벽 정보", EditorStyles.boldLabel);
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("인덱스:", GUILayout.Width(100));
+                EditorGUILayout.LabelField($"{currentWallIndex}", GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("위치:", GUILayout.Width(100));
+                EditorGUILayout.LabelField($"({selectedWall.x}, {selectedWall.y})", GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("방향:", GUILayout.Width(100));
+                selectedWall.WallDirection = (ObjectPropertiesEnum.WallDirection)EditorGUILayout.EnumPopup(selectedWall.WallDirection, GUILayout.Width(130));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("색상:", GUILayout.Width(100));
+                selectedWall.wallColor = (ColorType)EditorGUILayout.EnumPopup(selectedWall.wallColor, GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("길이:", GUILayout.Width(100));
+                selectedWall.Length = EditorGUILayout.IntField(selectedWall.Length, GUILayout.Width(100));
+                EditorGUILayout.EndHorizontal();
+
+                // 벽 선택 시, 선택 해제 버튼 추가
+                if (GUILayout.Button("선택 해제", GUILayout.Height(24)))
+                {
+                    currentWallIndex = -1;
+                }
+
+                // 벽 삭제 버튼
+                if (GUILayout.Button("이 벽 삭제", GUILayout.Height(24)))
+                {
+                    if (EditorUtility.DisplayDialog("벽 삭제", "정말로 이 벽을 삭제하시겠습니까?", "확인", "취소"))
+                    {
+                        walls.RemoveAt(currentWallIndex);
+                        currentWallIndex = -1;
+                    }
+                }
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("벽을 선택하려면 그리드에서 벽을 클릭하세요.", MessageType.Info);
+            }
+
+            EditorGUILayout.Space(10);
+
             // 벽 통계
             EditorGUILayout.LabelField("벽 통계", EditorStyles.boldLabel);
             EditorGUILayout.LabelField($"총 벽 수: {walls.Count}");
@@ -362,6 +417,38 @@ namespace Project.Scripts.Editor
                 EditorGUILayout.LabelField($"{GetWallDirectionName(directionCount.Key)}:", GUILayout.Width(100));
                 EditorGUILayout.LabelField($"{directionCount.Value}개", GUILayout.Width(100));
                 EditorGUILayout.EndHorizontal();
+            }
+
+            // 기믹별 통계 추가
+            EditorGUILayout.Space(5);
+            EditorGUILayout.LabelField("벽 기믹 통계:", EditorStyles.boldLabel);
+
+            Dictionary<WallGimmickType, int> gimmickCounts = new Dictionary<WallGimmickType, int>();
+            foreach (var wall in walls)
+            {
+                if (!gimmickCounts.ContainsKey(wall.WallGimmickType))
+                {
+                    gimmickCounts[wall.WallGimmickType] = 0;
+                }
+                gimmickCounts[wall.WallGimmickType]++;
+            }
+
+            if (gimmickCounts.Count == 0 || (gimmickCounts.Count == 1 && gimmickCounts.ContainsKey(WallGimmickType.None)))
+            {
+                EditorGUILayout.LabelField("설정된 기믹이 없습니다.");
+            }
+            else
+            {
+                foreach (var gimmickCount in gimmickCounts)
+                {
+                    if (gimmickCount.Key != WallGimmickType.None)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField($"{gimmickCount.Key}:", GUILayout.Width(100));
+                        EditorGUILayout.LabelField($"{gimmickCount.Value}개", GUILayout.Width(100));
+                        EditorGUILayout.EndHorizontal();
+                    }
+                }
             }
         }
 

@@ -13,6 +13,8 @@ Shader"Custom/WallStencilWriter"
         
         // 스텐실 속성
         _StencilRef("Stencil Ref", Range(0, 255)) = 1
+   // 클리핑 높이 속성 추가
+    _ClipHeight("Clip Height", Float) = 0.1
     }
     
     SubShader
@@ -97,6 +99,7 @@ float4 _BaseColor;
 float _Metallic;
 float _Smoothness;
 float _BumpScale;
+float _ClipHeight; // 추가된 부분
 CBUFFER_END
             
             Varyings vert(
@@ -137,7 +140,13 @@ half4 frag(Varyings input) : SV_Target
 {
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-                
+    
+      // 높이 기반 클리핑 추가 - 이 부분을 추가
+    if (input.positionWS.y < _ClipHeight)
+    {
+        // 바닥 부분은 스텐실에 영향을 주지 않도록 함
+        discard;
+    }
                 // 텍스처 및 색상
     float2 uv = input.uv;
     float4 albedoAlpha = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv);

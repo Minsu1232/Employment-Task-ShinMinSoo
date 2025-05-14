@@ -149,10 +149,6 @@ namespace Project.Scripts.View
         {
             if (wallStencilWriterMaterial == null) return;
 
-            // Board 레이어인 경우 스킵
-            if (obj.layer == LayerMask.NameToLayer("Board"))
-                return;
-
             // 메인 벽 Renderer만 찾기
             Renderer renderer = obj.GetComponent<Renderer>();
 
@@ -184,6 +180,9 @@ namespace Project.Scripts.View
                     material.mainTexture = originalMaterials[renderer].mainTexture;
                 }
                 material.color = originalMaterials[renderer].color;
+
+                // 클리핑 높이 설정 - 이 부분을 추가
+                material.SetFloat("_ClipHeight", 0.05f); // 바닥에서 약간 위 높이
 
                 // 머티리얼 적용
                 renderer.material = material;
@@ -268,7 +267,7 @@ namespace Project.Scripts.View
                     {
                         clipMaterial.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
 
-                        // 블렌딩 설정 복사
+                        // 블렌드 설정 복사
                         if (originalMat.HasProperty("_SrcBlend") && originalMat.HasProperty("_DstBlend"))
                         {
                             clipMaterial.SetFloat("_SrcBlend", originalMat.GetFloat("_SrcBlend"));
@@ -302,6 +301,9 @@ namespace Project.Scripts.View
                 // 클리핑 파라미터 설정
                 clipMaterial.SetVector("_ClipPlanePos", wallPosition);
                 clipMaterial.SetVector("_ClipPlaneNormal", wallNormal);
+
+                // 최소 높이 설정 - 이 부분을 추가
+                clipMaterial.SetFloat("_MinHeight", 0.05f); // 바닥에서 약간 위 높이
 
                 // 머티리얼 적용
                 renderer.material = clipMaterial;

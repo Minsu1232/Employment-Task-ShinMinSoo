@@ -45,9 +45,9 @@ namespace Project.Scripts.Controller
         /// 보드 생성
         /// </summary>
         public async Task<(Dictionary<(int x, int y), BoardBlockObject> boardBlockDic, int boardWidth, int boardHeight, Dictionary<(int, bool), BoardBlockObject> standardBlocks)> CreateBoardAsync(
-            int stageIdx,
-            Dictionary<(int x, int y), Dictionary<(DestroyWallDirection, ColorType), int>> wallCoorInfoDic,
-            GameObject boardParent)
+           int stageIdx,
+           Dictionary<(int x, int y), Dictionary<(DestroyWallDirection, ColorType), int>> wallCoorInfoDic,
+           GameObject boardParent)
         {
             int standardBlockIndex = -1;
 
@@ -65,13 +65,23 @@ namespace Project.Scripts.Controller
 
                 if (blockObj.TryGetComponent(out BoardBlockObject boardBlock))
                 {
-                    // 게임 설정 참조 전달
+                    // 게임 설정 컴포넌트 전달
                     var configInjector = blockObj.GetComponent<ConfigInjector>() ?? blockObj.AddComponent<ConfigInjector>();
                     configInjector.SetGameConfig(gameConfig);
 
                     // 보드 블록 속성 설정
                     boardBlock.x = data.x;
                     boardBlock.y = data.y;
+
+                    // 색상에 맞는 메테리얼 적용
+                    if (data.ColorType != ColorType.None)
+                    {
+                        Material blockMaterial = GetBoardBlockMaterial((int)data.ColorType);
+                        if (blockMaterial != null)
+                        {
+                            boardBlock.SetMaterial(blockMaterial, data.ColorType != ColorType.None);
+                        }
+                    }
 
                     if (wallCoorInfoDic.ContainsKey((boardBlock.x, boardBlock.y)))
                     {
@@ -95,15 +105,7 @@ namespace Project.Scripts.Controller
 
                     boardBlockDic.Add((data.x, data.y), boardBlock);
                 }
-                else
-                {
-                    Debug.LogWarning("boardBlockPrefab에 BoardBlockObject 컴포넌트가 필요합니다!");
-                }
             }
-
-            // 인접한 블록들의 속성 설정
-            SetupAdjacentBlocks();
-
             await Task.Yield();
 
             // 보드 크기 계산
@@ -113,7 +115,21 @@ namespace Project.Scripts.Controller
             // 보드 정보 반환
             return (boardBlockDic, boardWidth, boardHeight, standardBlockDic);
         }
-
+        /// <summary>
+        /// 보드 블록 메테리얼 반환
+        /// </summary>
+        public Material GetBoardBlockMaterial(int colorTypeIndex)
+        {
+            if (gameConfig != null &&
+                gameConfig.boardConfig != null &&
+                gameConfig.wallConfig.wallMaterials != null &&
+                colorTypeIndex >= 0 &&
+                colorTypeIndex < gameConfig.wallConfig.wallMaterials.Length)
+            {
+                return gameConfig.wallConfig.wallMaterials[colorTypeIndex];
+            }
+            return null;
+        }
         /// <summary>
         /// 인접한 블록들의 속성 설정
         /// </summary>

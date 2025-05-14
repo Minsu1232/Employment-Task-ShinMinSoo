@@ -130,23 +130,11 @@ namespace Project.Scripts.Editor
 
         #endregion
 
-        #region 미리보기 모드
+        
 
-        private void StartPreview()
-        {
-            // 미리보기 모드 시작
-            // 구현 예정
-            EditorUtility.DisplayDialog("미리보기 모드", "미리보기 모드는 아직 구현되지 않았습니다.", "확인");
-            previewMode = false;
-        }
+   
 
-        private void StopPreview()
-        {
-            // 미리보기 모드 종료
-            // 구현 예정
-        }
-
-        #endregion
+      
 
         #region JSON 변환
 
@@ -243,7 +231,17 @@ namespace Project.Scripts.Editor
         #endregion
 
         #region 유틸리티 메서드
+        // 월드 Y 좌표를 에디터 Y 좌표로 변환
+        private int WorldToEditorY(int worldY)
+        {
+            return gridHeight - 1 - worldY;
+        }
 
+        // 에디터 Y 좌표를 월드 Y 좌표로 변환
+        private int EditorToWorldY(int editorY)
+        {
+            return gridHeight - 1 - editorY;
+        }
         private Color GetColorFromType(ColorType colorType)
         {
             switch (colorType)

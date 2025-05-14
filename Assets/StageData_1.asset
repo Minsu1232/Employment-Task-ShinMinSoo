@@ -9,117 +9,167 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2ae8098bfee64a2b8f539977da18731, type: 3}
+  m_Script: {fileID: 11500000, guid: de197bd1a1f4ba04b88f524d1e4d11b3, type: 3}
   m_Name: StageData_1
   m_EditorClassIdentifier: 
   stageIndex: 1
   boardBlocks:
   - x: 0
     y: 0
-    colorType: 
-    dataType: 
+    colorType: 1
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 1
     y: 0
-    colorType: 
-    dataType: 
+    colorType: 2
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 2
     y: 0
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 3
     y: 0
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 4
     y: 0
-    colorType: 
-    dataType: 
+    colorType: 4
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 0
     y: 1
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 1
     y: 1
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 2
     y: 1
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 3
     y: 1
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 4
     y: 1
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 0
     y: 2
-    colorType: 
-    dataType: 
+    colorType: 5
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 1
     y: 2
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 2
     y: 2
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 3
     y: 2
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 4
     y: 2
-    colorType: 
-    dataType: 
+    colorType: 6
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 0
     y: 3
-    colorType: 
-    dataType: 
+    colorType: 5
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 1
     y: 3
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 2
     y: 3
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 3
     y: 3
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 4
     y: 3
-    colorType: 
-    dataType: 
+    colorType: 6
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 0
     y: 4
-    colorType: 
-    dataType: 
+    colorType: 3
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 1
     y: 4
-    colorType: 
-    dataType: 
+    colorType: 3
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 2
     y: 4
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 3
     y: 4
-    colorType: 
-    dataType: 
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   - x: 4
     y: 4
-    colorType: 
-    dataType: 
+    colorType: 6
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
   playingBlocks:
   - x: 0
     y: 0
+    colorType: 2
     center: {x: 0, y: 0}
     uniqueIndex: 0
-    colorType: 2
     shapes:
     - offset: {x: 0, y: 0}
     - offset: {x: 0, y: 1}
@@ -127,9 +177,9 @@ MonoBehaviour:
     - gimmickType: None
   - x: 0
     y: 0
+    colorType: 6
     center: {x: 2, y: 1}
     uniqueIndex: 1
-    colorType: 6
     shapes:
     - offset: {x: 0, y: 0}
     - offset: {x: 0, y: 1}
@@ -140,18 +190,18 @@ MonoBehaviour:
     - gimmickType: None
   - x: 0
     y: 0
+    colorType: 1
     center: {x: 4, y: 0}
     uniqueIndex: 2
-    colorType: 1
     shapes:
     - offset: {x: 0, y: 0}
     gimmicks:
     - gimmickType: None
   - x: 0
     y: 0
+    colorType: 3
     center: {x: 0, y: 4}
     uniqueIndex: 3
-    colorType: 3
     shapes:
     - offset: {x: 0, y: 0}
     - offset: {x: 1, y: 0}
@@ -161,9 +211,9 @@ MonoBehaviour:
     - gimmickType: None
   - x: 0
     y: 0
+    colorType: 5
     center: {x: 2, y: 4}
     uniqueIndex: 4
-    colorType: 5
     shapes:
     - offset: {x: 0, y: 0}
     - offset: {x: 1, y: 0}
@@ -173,79 +223,79 @@ MonoBehaviour:
     - gimmickType: None
   - x: 0
     y: 0
+    colorType: 4
     center: {x: 4, y: 4}
     uniqueIndex: 5
-    colorType: 4
     shapes:
     - offset: {x: 0, y: 0}
     - offset: {x: 0, y: -1}
     - offset: {x: 0, y: -2}
     gimmicks:
     - gimmickType: None
-  Walls:
+  walls:
   - x: 0
     y: 0
-    WallDirection: 3
+    wallDirection: 9
     length: 1
     wallColor: 1
     wallGimmickType: 0
   - x: 0
     y: 1
-    WallDirection: 3
+    wallDirection: 9
     length: 1
     wallColor: 0
-    wallGimmickType: 0
+    wallGimmickType: 4
   - x: 2
     y: 0
-    WallDirection: 2
+    wallDirection: 2
     length: 2
     wallColor: 0
     wallGimmickType: 0
   - x: 4
     y: 0
-    WallDirection: 4
+    wallDirection: 4
     length: 2
     wallColor: 0
     wallGimmickType: 0
   - x: 0
     y: 4
-    WallDirection: 3
+    wallDirection: 3
     length: 1
     wallColor: 0
     wallGimmickType: 0
   - x: 2
     y: 4
-    WallDirection: 1
+    wallDirection: 1
+    length: 3
+    wallColor: 0
+    wallGimmickType: 0
+  - x: 2
+    y: 4
+    wallDirection: 1
+    length: 3
+    wallColor: 0
+    wallGimmickType: 0
+  - x: 2
+    y: 4
+    wallDirection: 1
     length: 3
     wallColor: 0
     wallGimmickType: 0
   - x: 0
-    y: 0
-    WallDirection: 2
-    length: 2
-    wallColor: 2
-    wallGimmickType: 0
-  - x: 0
-    y: 2
-    WallDirection: 3
-    length: 2
-    wallColor: 5
-    wallGimmickType: 0
-  - x: 0
     y: 4
-    WallDirection: 1
+    wallDirection: 1
     length: 2
     wallColor: 3
     wallGimmickType: 0
   - x: 4
     y: 0
-    WallDirection: 2
+    wallDirection: 2
     length: 1
     wallColor: 4
     wallGimmickType: 0
   - x: 4
     y: 2
-    WallDirection: 4
+    wallDirection: 4
     length: 3
     wallColor: 6
     wallGimmickType: 0

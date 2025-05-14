@@ -3,6 +3,12 @@ using UnityEngine;
 
 namespace Project.Scripts.Model
 {
+    [System.Serializable]
+    public class CheckGroupInfo
+    {
+        public int groupId;
+        public List<Vector2Int> blockPositions = new List<Vector2Int>();
+    }
     [CreateAssetMenu(fileName = "StageData", menuName = "Game/Stage Data")]
     public class StageData : ScriptableObject, IGameData
     {
@@ -10,7 +16,8 @@ namespace Project.Scripts.Model
         public List<BoardBlockData> boardBlocks = new List<BoardBlockData>();
         public List<PlayingBlockData> playingBlocks = new List<PlayingBlockData>();
         public List<WallData> walls = new List<WallData>();
-
+        // 체크 그룹 정보 추가
+        public List<CheckGroupInfo> checkGroups = new List<CheckGroupInfo>();
         /// <summary>
         /// 스테이지 데이터 복제
         /// </summary>

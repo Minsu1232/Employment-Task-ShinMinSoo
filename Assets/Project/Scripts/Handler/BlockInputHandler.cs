@@ -20,7 +20,7 @@ namespace Project.Scripts.Controller
         private Vector3 offset;
         private float zDistanceToCamera;
 
-        private void Awake()
+        private void Start()
         {
             dragHandler = GetComponent<BlockDragHandler>();
             physicsHandler = GetComponent<BlockPhysicsHandler>();

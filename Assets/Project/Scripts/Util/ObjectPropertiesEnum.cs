@@ -31,6 +31,11 @@ public class ObjectPropertiesEnum
     public enum WallGimmickType
     {
         None = 0,
-        Lock_OnOff
+        Constraint,
+        Multiple,
+        Frozen,
+        Star,
+        Key,
+        Lock
     }
 }

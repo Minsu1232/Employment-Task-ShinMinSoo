@@ -23,7 +23,7 @@ namespace Project.Scripts.Controller
         private BlockFactory blockFactory;
         private VisualEffectManager visualEffectManager;
         private BlockDestroyManager blockDestroyManager;
-
+        private CheckBlockGroupManager checkBlockManager;
         // 게임 상태
         private int nowStageIndex = 0;
         public int boardWidth { get; private set; }
@@ -71,11 +71,13 @@ namespace Project.Scripts.Controller
             blockFactory = GetComponent<BlockFactory>() ?? gameObject.AddComponent<BlockFactory>();
             visualEffectManager = GetComponent<VisualEffectManager>() ?? gameObject.AddComponent<VisualEffectManager>();
             blockDestroyManager = GetComponent<BlockDestroyManager>() ?? gameObject.AddComponent<BlockDestroyManager>();
+            checkBlockManager = GetComponent<CheckBlockGroupManager>() ?? gameObject.AddComponent<CheckBlockGroupManager>();
 
             boardBuilder.Initialize(gameConfig);
             wallBuilder.Initialize(gameConfig);
             blockFactory.Initialize(gameConfig);
             visualEffectManager.Initialize(gameConfig);
+            blockDestroyManager.Initialize(gameConfig);
         }
 
         /// <summary>
@@ -128,8 +130,8 @@ namespace Project.Scripts.Controller
             var boardInfo = await boardBuilder.CreateBoardAsync(stageIdx, wallCoordInfo, boardParent);
 
             // BlockDestroyManager 초기화 
-            blockDestroyManager.Initialize(gameConfig, boardInfo.boardBlockDic, boardInfo.boardWidth, boardInfo.boardHeight);
-            blockDestroyManager.SetStandardBlockData(boardInfo.standardBlocks);
+            checkBlockManager.Initialize(gameConfig, boardInfo.boardBlockDic, boardInfo.boardWidth, boardInfo.boardHeight, gameConfig.stageDatas[stageIdx]);
+            checkBlockManager.SetStandardBlockData(boardInfo.standardBlocks);
 
             await blockFactory.CreatePlayingBlocksAsync(stageIdx, boardInfo.boardBlockDic, boardInfo.boardWidth, boardInfo.boardHeight, playingBlockParent);
 

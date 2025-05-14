@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using Project.Scripts.Model;
 using System.Collections.Generic;
+using static ObjectPropertiesEnum;
 
 namespace Project.Scripts.Editor
 {
@@ -22,12 +23,13 @@ namespace Project.Scripts.Editor
                 gridPos -= gridViewRect.position;  // 그리드 뷰 위치 조정
                 gridPos += scrollPosition;         // 스크롤 위치 반영
 
-                currentMouseGridPos.x = Mathf.FloorToInt(gridPos.x / gridSize);
-                currentMouseGridPos.y = Mathf.FloorToInt(gridPos.y / gridSize);
+                // 에디터 그리드 좌표
+                int editorGridX = Mathf.FloorToInt(gridPos.x / gridSize);
+                int editorGridY = Mathf.FloorToInt(gridPos.y / gridSize);
 
-                // 그리드 범위 제한
-                currentMouseGridPos.x = Mathf.Clamp(currentMouseGridPos.x, 0, gridWidth - 1);
-                currentMouseGridPos.y = Mathf.Clamp(currentMouseGridPos.y, 0, gridHeight - 1);
+                // 에디터 좌표를 월드 좌표로 변환하여 저장
+                currentMouseGridPos.x = editorGridX;
+                currentMouseGridPos.y = EditorToWorldY(editorGridY);
 
                 // 자유 모양 모드에서 드래그 중이면 셀 선택 처리 - 플레이 블록
                 if (isDraggingInFreeFormMode && currentTool == EditTool.PlayingBlock &&
@@ -72,11 +74,17 @@ namespace Project.Scripts.Editor
                 Vector2 mousePos = e.mousePosition;
                 mousePos -= gridViewRect.position;   // 스크롤뷰 내부 좌표로 보정
                 mousePos += scrollPosition;          // 현재 스크롤 반영
-                int gridX = Mathf.FloorToInt(mousePos.x / gridSize);
-                int gridY = Mathf.FloorToInt(mousePos.y / gridSize);
+
+                // 에디터 좌표 계산
+                int editorGridX = Mathf.FloorToInt(mousePos.x / gridSize);
+                int editorGridY = Mathf.FloorToInt(mousePos.y / gridSize);
+
+                // 월드 좌표 계산 (저장용)
+                int worldGridX = editorGridX;
+                int worldGridY = EditorToWorldY(editorGridY);
 
                 // 그리드 범위 체크
-                if (gridX >= 0 && gridX < gridWidth && gridY >= 0 && gridY < gridHeight)
+                if (editorGridX >= 0 && editorGridX < gridWidth && editorGridY >= 0 && editorGridY < gridHeight)
                 {
                     // 왼쪽 마우스 버튼 클릭
                     if (e.button == 0)
@@ -89,15 +97,15 @@ namespace Project.Scripts.Editor
                                 {
                                     // 사각형 모드 - 드래그 시작
                                     isDraggingBoardBlock = true;
-                                    boardDragStart = new Vector2Int(gridX, gridY);
+                                    boardDragStart = new Vector2Int(editorGridX, editorGridY);
                                     // 클릭으로 단일 블록 배치는 유지
-                                    PlaceBoardBlock(gridX, gridY);
+                                    PlaceBoardBlock(worldGridX, worldGridY);
                                 }
                                 else // FreeForm 모드
                                 {
                                     // 자유 모양 모드 - 드래그 시작 및 셀 선택 처리
                                     isDraggingBoardFreeForm = true;
-                                    Vector2Int cell = new Vector2Int(gridX, gridY);
+                                    Vector2Int cell = new Vector2Int(worldGridX, worldGridY);
                                     lastDraggedBoardCell = cell;
 
                                     // Shift 키를 누른 상태면 추가/제거
@@ -119,20 +127,20 @@ namespace Project.Scripts.Editor
                             case EditTool.PlayingBlock:
                                 if (playingBlockMode == PlayingBlockMode.Rectangle)
                                 {
-                                    // 사각형 모드 - 드래그 시작
-                                    startDragPosition = new Vector2Int(gridX, gridY);
-                                    CheckPlayingBlockSelection(gridX, gridY);
+                                    // 사각형 모드 - 드래그 시작 (에디터 좌표 사용)
+                                    startDragPosition = new Vector2Int(editorGridX, editorGridY);
+                                    CheckPlayingBlockSelection(worldGridX, worldGridY);
                                 }
                                 else // FreeForm 모드
                                 {
                                     // 자유 모양 모드 - 드래그 시작 및 셀 선택 처리
                                     isDraggingInFreeFormMode = true;
-                                    Vector2Int cell = new Vector2Int(gridX, gridY);
+                                    Vector2Int cell = new Vector2Int(worldGridX, worldGridY);
                                     lastDraggedCell = cell;
 
                                     // 기존 블록 선택 체크
                                     int oldIndex = currentPlayingBlockIndex;
-                                    CheckPlayingBlockSelection(gridX, gridY);
+                                    CheckPlayingBlockSelection(worldGridX, worldGridY);
 
                                     // 블록이 선택되지 않은 경우만 셀 선택 처리
                                     if (currentPlayingBlockIndex < 0)
@@ -158,15 +166,27 @@ namespace Project.Scripts.Editor
                                 break;
 
                             case EditTool.Wall:
-                                PlaceWall(gridX, gridY);
+                                PlaceWall(worldGridX, worldGridY);
                                 break;
 
                             case EditTool.Gimmick:
-                                PlaceGimmick(gridX, gridY);
+                                // 기믹 도구 선택 시, 먼저 벽 선택 여부 확인
+                                CheckWallSelection(worldGridX, worldGridY);
+
+                                // 벽이 선택되었으면 기믹 적용
+                                if (currentWallIndex >= 0)
+                                {
+                                    PlaceWallGimmick(worldGridX, worldGridY);
+                                }
+                                else
+                                {
+                                    // 기존의 블록 기믹 처리 유지
+                                    PlaceGimmick(worldGridX, worldGridY);
+                                }
                                 break;
 
                             case EditTool.Erase:
-                                EraseObject(gridX, gridY);
+                                EraseObject(worldGridX, worldGridY);
                                 break;
                         }
                         e.Use();
@@ -176,7 +196,6 @@ namespace Project.Scripts.Editor
             else if (e.type == EventType.MouseDrag && e.button == 0)
             {
                 // 자유 모양 모드에서 드래그 처리는 이미 상단에서 처리됨
-                // 필요한 경우 여기에 추가 로직 추가
                 e.Use();
             }
             else if (e.type == EventType.MouseUp && e.button == 0)
@@ -184,28 +203,35 @@ namespace Project.Scripts.Editor
                 Vector2 mousePos = e.mousePosition;
                 mousePos -= gridViewRect.position;   // 스크롤뷰 내부 좌표로 보정
                 mousePos += scrollPosition;          // 현재 스크롤 반영
-                int gridX = Mathf.FloorToInt(mousePos.x / gridSize);
-                int gridY = Mathf.FloorToInt(mousePos.y / gridSize);
+
+                // 에디터 좌표 계산
+                int editorGridX = Mathf.FloorToInt(mousePos.x / gridSize);
+                int editorGridY = Mathf.FloorToInt(mousePos.y / gridSize);
+
+                // 월드 좌표 계산 (저장용)
+                int worldGridX = editorGridX;
+                int worldGridY = EditorToWorldY(editorGridY);
 
                 // 사각형 모드 보드 블록 드래그 처리
                 if (isDraggingBoardBlock && boardDragStart.HasValue && currentTool == EditTool.BoardBlock &&
                     boardBlockMode == BoardBlockMode.Rectangle)
                 {
                     // 그리드 범위 체크
-                    if (gridX >= 0 && gridX < gridWidth && gridY >= 0 && gridY < gridHeight)
+                    if (editorGridX >= 0 && editorGridX < gridWidth && editorGridY >= 0 && editorGridY < gridHeight)
                     {
-                        // 드래그 영역 계산
-                        int startX = Mathf.Min(boardDragStart.Value.x, gridX);
-                        int startY = Mathf.Min(boardDragStart.Value.y, gridY);
-                        int endX = Mathf.Max(boardDragStart.Value.x, gridX);
-                        int endY = Mathf.Max(boardDragStart.Value.y, gridY);
+                        // 드래그 영역 계산 (에디터 좌표)
+                        int startEditorX = Mathf.Min(boardDragStart.Value.x, editorGridX);
+                        int startEditorY = Mathf.Min(boardDragStart.Value.y, editorGridY);
+                        int endEditorX = Mathf.Max(boardDragStart.Value.x, editorGridX);
+                        int endEditorY = Mathf.Max(boardDragStart.Value.y, editorGridY);
 
-                        // 영역 내 모든 셀에 보드 블록 배치
-                        for (int x = startX; x <= endX; x++)
+                        // 영역 내 모든 셀에 보드 블록 배치 (월드 좌표로 변환하여 저장)
+                        for (int x = startEditorX; x <= endEditorX; x++)
                         {
-                            for (int y = startY; y <= endY; y++)
+                            for (int y = startEditorY; y <= endEditorY; y++)
                             {
-                                PlaceBoardBlock(x, y);
+                                int worldY = EditorToWorldY(y);
+                                PlaceBoardBlock(x, worldY);
                             }
                         }
                     }
@@ -227,15 +253,15 @@ namespace Project.Scripts.Editor
                     playingBlockMode == PlayingBlockMode.Rectangle)
                 {
                     // 그리드 범위 체크
-                    if (gridX >= 0 && gridX < gridWidth && gridY >= 0 && gridY < gridHeight)
+                    if (editorGridX >= 0 && editorGridX < gridWidth && editorGridY >= 0 && editorGridY < gridHeight)
                     {
                         // 최소 드래그 거리 확인
-                        bool validDrag = (startDragPosition.Value.x != gridX || startDragPosition.Value.y != gridY);
+                        bool validDrag = (startDragPosition.Value.x != editorGridX || startDragPosition.Value.y != editorGridY);
 
                         // 드래그가 유효하거나, 블록이 선택되지 않은 경우에만 블록 생성
                         if (validDrag || currentPlayingBlockIndex < 0)
                         {
-                            FinishDragAndPlacePlayingBlock(gridX, gridY);
+                            FinishDragAndPlacePlayingBlock(worldGridX, worldGridY);
                         }
                     }
 
@@ -285,6 +311,7 @@ namespace Project.Scripts.Editor
             selectedBoardCells.Clear();
         }
         // 자유 모양 모드에서 드래그로 셀 선택 처리
+        // HandleFreeFormDrag 메서드 수정
         private void HandleFreeFormDrag(Vector2Int currentCell)
         {
             // 마지막으로 드래그된 셀과 동일하면 무시
@@ -308,16 +335,15 @@ namespace Project.Scripts.Editor
         private void PlaceBoardBlock(int x, int y)
         {
             // 기존 블록 확인
+            // 기존 코드 그대로 사용
             BoardBlockData existingBlock = boardBlocks.Find(b => b.x == x && b.y == y);
 
             if (existingBlock != null)
             {
-                // 기존 블록 수정
                 existingBlock.ColorType = selectedColor;
             }
             else
             {
-                // 새 블록 생성
                 BoardBlockData newBlock = new BoardBlockData(x, y);
                 newBlock.ColorType = selectedColor;
                 boardBlocks.Add(newBlock);
@@ -375,27 +401,51 @@ namespace Project.Scripts.Editor
                 return;
             }
 
-            // 드래그 영역 계산
-            int startX = Mathf.Min(startDragPosition.Value.x, endX);
-            int startY = Mathf.Min(startDragPosition.Value.y, endY);
-            int width = Mathf.Abs(endX - startDragPosition.Value.x) + 1;
-            int height = Mathf.Abs(endY - startDragPosition.Value.y) + 1;
+            // 드래그 시작점은 에디터 좌표
+            Vector2Int dragStart = startDragPosition.Value;
 
-            // 중심 위치 계산 (좌상단 기준)
-            Vector2Int center = new Vector2Int(startX, startY);
+            // endY는 월드 좌표로 가정 (EditorToWorldY 함수로 이미 변환된 상태)
+            // 에디터 좌표로 다시 변환
+            int endEditorY = WorldToEditorY(endY);
+
+            // 에디터 좌표 기준으로 영역 계산
+            int startEditorX = Mathf.Min(dragStart.x, endX);
+            int startEditorY = Mathf.Min(dragStart.y, endEditorY);
+            int endEditorX = Mathf.Max(dragStart.x, endX);
+            int endEditor_Y = Mathf.Max(dragStart.y, endEditorY);
+
+            int width = endEditorX - startEditorX + 1;
+            int height = endEditor_Y - startEditorY + 1;
+
+            // 중심 위치 계산 - 드래그 영역의 실제 중심으로 계산
+            // 1. 에디터 좌표에서 중심점 계산
+            int centerEditorX = startEditorX + (width - 1) / 2;
+            int centerEditorY = startEditorY + (height - 1) / 2;
+
+            // 2. 에디터 좌표를 월드 좌표로 변환
+            int centerWorldX = centerEditorX;
+            int centerWorldY = EditorToWorldY(centerEditorY);
 
             // 새 블록 생성
             PlayingBlockData newBlock = new PlayingBlockData();
-            newBlock.center = center;
+            newBlock.center = new Vector2Int(centerWorldX, centerWorldY);  // 월드 좌표로 중심 설정
             newBlock.ColorType = selectedColor;
             newBlock.uniqueIndex = playingBlocks.Count;
 
-            // 블록 모양 추가
+            // 블록 모양 추가 - 중심점 기준 오프셋 계산
             for (int x = 0; x < width; x++)
-            { 
+            {
                 for (int y = 0; y < height; y++)
                 {
-                    ShapeData shape = new ShapeData(x, y);
+                    // 에디터 좌표에서 오프셋 계산
+                    int offsetEditorX = (startEditorX + x) - centerEditorX;
+                    int offsetEditorY = (startEditorY + y) - centerEditorY;
+
+                    // Y 좌표만 변환 필요 (X는 동일)
+                    int offsetWorldX = offsetEditorX;
+                    int offsetWorldY = -offsetEditorY; // Y축 방향이 반대라서 부호 반전
+
+                    ShapeData shape = new ShapeData(offsetWorldX, offsetWorldY);
                     newBlock.AddShape(shape);
                 }
             }
@@ -410,6 +460,7 @@ namespace Project.Scripts.Editor
         }
 
         // 자유 모양 블록 생성 메서드
+        // CreateFreeFormPlayingBlock 메서드 수정
         private void CreateFreeFormPlayingBlock()
         {
             if (selectedCells.Count == 0)
@@ -448,30 +499,131 @@ namespace Project.Scripts.Editor
 
         private void PlaceWall(int x, int y)
         {
+            // 이미 선택된 벽이 있으면 처리하지 않음 (기믹 도구를 사용중일 수 있음)
+            if (currentTool == EditTool.Gimmick && currentWallIndex >= 0)
+                return;
+
             // 기존 벽 확인
             WallData existingWall = walls.Find(w =>
                 w.x == x && w.y == y && w.WallDirection == wallDirection);
 
             if (existingWall != null)
             {
-                // 기존 벽 수정
-                existingWall.Length = wallLength;
-                existingWall.wallColor = wallColor;
+                // 기존 벽이 있을 경우 선택 상태로 변경
+                currentWallIndex = walls.IndexOf(existingWall);
             }
             else
             {
-                // 새 벽 생성
-                WallData wall = new WallData();
-                wall.x = x;
-                wall.y = y;
-                wall.WallDirection = wallDirection;
-                wall.Length = wallLength;
-                wall.wallColor = wallColor;
-
+                // 새 벽 생성 - 기본적으로는 기믹 없이 생성
+                WallData wall = new WallData(x, y, wallDirection, wallLength, wallColor, WallGimmickType.None);
                 walls.Add(wall);
+                currentWallIndex = walls.Count - 1;
             }
         }
+        // 벽 선택 메서드 추가 (CheckWallSelection)
+        private void CheckWallSelection(int x, int y)
+        {
+            // 기존 벽들 중에서 선택된 위치에 있는 벽 찾기
+            for (int i = 0; i < walls.Count; i++)
+            {
+                var wall = walls[i];
+                if (wall.x == x && wall.y == y)
+                {
+                    currentWallIndex = i;
+                    return;
+                }
 
+                // 확장된 벽 영역도 검사
+                if (wall.Length > 1)
+                {
+                    bool isExtendedWall = false;
+
+                    // 벽 방향에 따라 확장 영역 계산
+                    switch (wall.WallDirection)
+                    {
+                        case ObjectPropertiesEnum.WallDirection.Single_Up:
+                        case ObjectPropertiesEnum.WallDirection.Single_Down:
+                        case ObjectPropertiesEnum.WallDirection.Left_Up:
+                        case ObjectPropertiesEnum.WallDirection.Left_Down:
+                        case ObjectPropertiesEnum.WallDirection.Right_Up:
+                        case ObjectPropertiesEnum.WallDirection.Right_Down:
+                        case ObjectPropertiesEnum.WallDirection.Open_Up:
+                        case ObjectPropertiesEnum.WallDirection.Open_Down:
+                            // 오른쪽으로 확장
+                            for (int j = 1; j < wall.Length; j++)
+                            {
+                                if (wall.x + j == x && wall.y == y)
+                                {
+                                    isExtendedWall = true;
+                                    break;
+                                }
+                            }
+                            break;
+
+                        case ObjectPropertiesEnum.WallDirection.Single_Left:
+                        case ObjectPropertiesEnum.WallDirection.Single_Right:
+                        case ObjectPropertiesEnum.WallDirection.Open_Left:
+                        case ObjectPropertiesEnum.WallDirection.Open_Right:
+                            // 아래쪽으로 확장
+                            for (int j = 1; j < wall.Length; j++)
+                            {
+                                if (wall.x == x && wall.y + j == y)
+                                {
+                                    isExtendedWall = true;
+                                    break;
+                                }
+                            }
+                            break;
+                    }
+
+                    if (isExtendedWall)
+                    {
+                        currentWallIndex = i;
+                        return;
+                    }
+                }
+            }
+
+            // 선택된 벽이 없으면 -1로 설정
+            currentWallIndex = -1;
+        }
+        private WallGimmickType ConvertToWallGimmickType(string gimmickType)
+        {
+            // 문자열 기반으로 WallGimmickType 변환
+            switch (gimmickType)
+            {
+                case "Star": return WallGimmickType.Star;
+                case "Lock": return WallGimmickType.Lock;
+                case "Key": return WallGimmickType.Key;
+                case "Constraint": return WallGimmickType.Constraint;
+                case "Multiple": return WallGimmickType.Multiple;
+                case "Frozen": return WallGimmickType.Frozen;
+                default: return WallGimmickType.None;
+            }
+        }
+        // 벽에 기믹 추가하는 새 메서드
+        private void PlaceWallGimmick(int x, int y)
+        {
+            if (currentWallIndex >= 0 && currentWallIndex < walls.Count)
+            {
+                var targetWall = walls[currentWallIndex];
+
+                // 문자열 기반 기믹 타입 사용 또는 변환
+                WallGimmickType wallGimmickType = ConvertToWallGimmickType(selectedGimmick);
+
+                // 선택된 벽에 기믹 적용
+                if (targetWall.WallGimmickType == wallGimmickType)
+                {
+                    // 같은 기믹 타입이면 제거 (토글)
+                    targetWall.WallGimmickType = WallGimmickType.None;
+                }
+                else
+                {
+                    // 다른 기믹 타입이면 변경
+                    targetWall.WallGimmickType = wallGimmickType;
+                }
+            }
+        }
         private void PlaceGimmick(int x, int y)
         {
             // 플레이 블록 찾기

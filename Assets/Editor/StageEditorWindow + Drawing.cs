@@ -1,58 +1,59 @@
-// 3. StageEditorWindow.Drawing.cs - UI ±×¸®±â °ü·Ã ¸Ş¼­µå
+ï»¿// 3. StageEditorWindow.Drawing.cs - UI ê·¸ë¦¬ê¸° ê´€ë ¨ ë©”ì„œë“œ
 using UnityEditor;
 using UnityEngine;
 using Project.Scripts.Model;
 using System.Collections.Generic;
 using Project.Scripts.Controller;
+using static ObjectPropertiesEnum;
 
 namespace Project.Scripts.Editor
 {
     public partial class StageEditorWindow
     {
-        #region ±×¸®±â ¸Ş¼­µå
+        #region ê·¸ë¦¬ê¸° ë©”ì„œë“œ
 
         private void DrawToolbar()
         {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            // ÆÄÀÏ ¸Ş´º
-            if (GUILayout.Button("»õ ½ºÅ×ÀÌÁö", EditorStyles.toolbarButton, GUILayout.Width(80)))
+            // íŒŒì¼ ë©”ë‰´
+            if (GUILayout.Button("ìƒˆ ìŠ¤í…Œì´ì§€", EditorStyles.toolbarButton, GUILayout.Width(80)))
             {
-                if (EditorUtility.DisplayDialog("»õ ½ºÅ×ÀÌÁö", "»õ ½ºÅ×ÀÌÁö¸¦ ¸¸µå½Ã°Ú½À´Ï±î? ÀúÀåµÇÁö ¾ÊÀº º¯°æ»çÇ×Àº »ç¶óÁı´Ï´Ù.", "È®ÀÎ", "Ãë¼Ò"))
+                if (EditorUtility.DisplayDialog("ìƒˆ ìŠ¤í…Œì´ì§€", "ìƒˆ ìŠ¤í…Œì´ì§€ë¥¼ ë§Œë“œì‹œê² ìŠµë‹ˆê¹Œ? ì €ì¥ë˜ì§€ ì•Šì€ ë³€ê²½ì‚¬í•­ì€ ì‚¬ë¼ì§‘ë‹ˆë‹¤.", "í™•ì¸", "ì·¨ì†Œ"))
                 {
                     CreateNewStage();
                 }
             }
 
-            if (GUILayout.Button("ºÒ·¯¿À±â", EditorStyles.toolbarButton, GUILayout.Width(80)))
+            if (GUILayout.Button("ë¶ˆëŸ¬ì˜¤ê¸°", EditorStyles.toolbarButton, GUILayout.Width(80)))
             {
                 LoadStage();
             }
 
-            if (GUILayout.Button("ÀúÀå", EditorStyles.toolbarButton, GUILayout.Width(80)))
+            if (GUILayout.Button("ì €ì¥", EditorStyles.toolbarButton, GUILayout.Width(80)))
             {
                 SaveStage();
             }
 
-            // JSON º¯È¯ ¹öÆ°
-            if (GUILayout.Button("JSON º¯È¯", EditorStyles.toolbarButton, GUILayout.Width(80)))
+            // JSON ë³€í™˜ ë²„íŠ¼
+            if (GUILayout.Button("JSON ë³€í™˜", EditorStyles.toolbarButton, GUILayout.Width(80)))
             {
                 showJsonPanel = !showJsonPanel;
             }
 
             GUILayout.FlexibleSpace();
 
-            // µµ±¸ ¼±ÅÃ (´ÜÃàÅ° ÈùÆ® Ãß°¡)
-            string[] toolLabels = new string[] { "1: º¸µå ºí·Ï", "2: ÇÃ·¹ÀÌ ºí·Ï", "3: º®", "4: ±â¹Í", "5: Áö¿ì±â" };
+            // ë„êµ¬ ì„ íƒ (ë‹¨ì¶•í‚¤ íŒíŠ¸ ì¶”ê°€)
+            string[] toolLabels = new string[] { "1: ë³´ë“œ ë¸”ë¡", "2: í”Œë ˆì´ ë¸”ë¡", "3: ë²½", "4: ê¸°ë¯¹", "5: ì§€ìš°ê¸°" };
 
-            // Åø¹Ù ½ºÅ¸ÀÏ »ı¼º ¹× Á¶Á¤
+            // íˆ´ë°” ìŠ¤íƒ€ì¼ ìƒì„± ë° ì¡°ì •
             GUIStyle toolbarStyle = new GUIStyle(EditorStyles.toolbarButton);
             
 
-            // ¹è°æ»ö ÀúÀå
+            // ë°°ê²½ìƒ‰ ì €ì¥
             Color origBgColor = GUI.backgroundColor;
 
-            // Ä¿½ºÅÒ Åø¹Ù ±×¸®±â
+            // ì»¤ìŠ¤í…€ íˆ´ë°” ê·¸ë¦¬ê¸°
             int newToolIndex = GUILayout.Toolbar(
                 (int)currentTool,
                 toolLabels,
@@ -60,20 +61,20 @@ namespace Project.Scripts.Editor
                 GUILayout.Width(450)
             );
 
-            // µµ±¸ º¯°æ °¨Áö
+            // ë„êµ¬ ë³€ê²½ ê°ì§€
             if (newToolIndex != (int)currentTool)
             {
                 currentTool = (EditTool)newToolIndex;
-                GUI.FocusControl(null); // Æ÷Ä¿½º ÃÊ±âÈ­
+                GUI.FocusControl(null); // í¬ì»¤ìŠ¤ ì´ˆê¸°í™”
             }
 
-            // ¹è°æ»ö º¹¿ø
+            // ë°°ê²½ìƒ‰ ë³µì›
             GUI.backgroundColor = origBgColor;
 
             GUILayout.FlexibleSpace();
 
-            // ±×¸®µå Å©±â Á¶Á¤
-            EditorGUILayout.LabelField("±×¸®µå Å©±â:", GUILayout.Width(60));
+            // ê·¸ë¦¬ë“œ í¬ê¸° ì¡°ì •
+            EditorGUILayout.LabelField("ê·¸ë¦¬ë“œ í¬ê¸°:", GUILayout.Width(60));
 
             if (GUILayout.Button("+", EditorStyles.toolbarButton, GUILayout.Width(20)))
             {
@@ -85,9 +86,9 @@ namespace Project.Scripts.Editor
                 gridSize = Mathf.Max(gridSize - 5, 30);
             }
 
-            // ¹Ì¸®º¸±â ¸ğµå
+            // ë¯¸ë¦¬ë³´ê¸° ëª¨ë“œ
             GUI.changed = false;
-            bool newPreviewMode = GUILayout.Toggle(previewMode, "¹Ì¸®º¸±â", EditorStyles.toolbarButton, GUILayout.Width(80));
+            bool newPreviewMode = GUILayout.Toggle(previewMode, "ë¯¸ë¦¬ë³´ê¸°", EditorStyles.toolbarButton, GUILayout.Width(80));
             if (newPreviewMode != previewMode)
             {
                 previewMode = newPreviewMode;
@@ -108,14 +109,14 @@ namespace Project.Scripts.Editor
         {
             gridViewRect = EditorGUILayout.GetControlRect(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
-            // ±×¸®µå ¹è°æ
+            // ê·¸ë¦¬ë“œ ë°°ê²½
             GUI.DrawTexture(gridViewRect, gridTexture);
 
-            // ½ºÅ©·Ñ ¿µ¿ª ½ÃÀÛ
+            // ìŠ¤í¬ë¡¤ ì˜ì—­ ì‹œì‘
             scrollPosition = GUI.BeginScrollView(gridViewRect, scrollPosition,
                 new Rect(0, 0, gridWidth * gridSize, gridHeight * gridSize));
 
-            // ±×¸®µå ¼¿ ±×¸®±â
+            // ê·¸ë¦¬ë“œ ì…€ ê·¸ë¦¬ê¸°
             for (int x = 0; x < gridWidth; x++)
             {
                 for (int y = 0; y < gridHeight; y++)
@@ -123,31 +124,39 @@ namespace Project.Scripts.Editor
                     Rect cellRect = new Rect(x * gridSize, y * gridSize, gridSize - 1, gridSize - 1);
                     GUI.DrawTexture(cellRect, cellTexture);
 
-                    // º® ±×¸®±â
-                    DrawwallsOnGrid(x, y, cellRect);
+                   
 
-                    // º¸µå ºí·Ï ±×¸®±â
+                    // ë³´ë“œ ë¸”ë¡ ê·¸ë¦¬ê¸°
                     DrawBoardBlocksOnGrid(x, y, cellRect);
 
-                    // ÇÃ·¹ÀÌ ºí·Ï ±×¸®±â
+                    // í”Œë ˆì´ ë¸”ë¡ ê·¸ë¦¬ê¸°
                     DrawPlayingBlocksOnGrid(x, y, cellRect);
+                    // ë²½ ê·¸ë¦¬ê¸°
+                    DrawwallsOnGrid(x, y, cellRect);
                 }
             }
 
-            // ¸¶¿ì½º È£¹ö ¹× ¼±ÅÃ ¼¿ È¿°ú
+            // ë§ˆìš°ìŠ¤ í˜¸ë²„ ë° ì„ íƒ ì…€ íš¨ê³¼
             DrawHoverAndSelectionEffects();
 
-            // º¸µå ºí·Ï »ç°¢Çü µå·¡±× ¿µ¿ª Ç¥½Ã
+            // ë³´ë“œ ë¸”ë¡ ì‚¬ê°í˜• ë“œë˜ê·¸ ì˜ì—­ í‘œì‹œ
             if (boardDragStart.HasValue && currentTool == EditTool.BoardBlock &&
-                boardBlockMode == BoardBlockMode.Rectangle && isDraggingBoardBlock)
+     boardBlockMode == BoardBlockMode.Rectangle && isDraggingBoardBlock)
             {
-                // µå·¡±× ¿µ¿ª °è»ê
-                int startX = Mathf.Min(boardDragStart.Value.x, currentMouseGridPos.x);
-                int startY = Mathf.Min(boardDragStart.Value.y, currentMouseGridPos.y);
-                int endX = Mathf.Max(boardDragStart.Value.x, currentMouseGridPos.x);
-                int endY = Mathf.Max(boardDragStart.Value.y, currentMouseGridPos.y);
+                // ë“œë˜ê·¸ ì‹œì‘ì ê³¼ í˜„ì¬ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ (ì—ë””í„° ì¢Œí‘œ)
+                Vector2Int dragStart = boardDragStart.Value;
 
-                // ½Ã°¢Àû È¿°ú (¸ğµç ¼¿ ¹× Å×µÎ¸® ±×¸®±â)
+                // currentMouseGridPosëŠ” ì›”ë“œ ì¢Œí‘œì¼ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ì—ë””í„° ì¢Œí‘œë¡œ ë³€í™˜
+                int currentEditorMouseY = WorldToEditorY(currentMouseGridPos.y);
+                Vector2Int currentEditorMouse = new Vector2Int(currentMouseGridPos.x, currentEditorMouseY);
+
+                // ë“œë˜ê·¸ ì˜ì—­ ê³„ì‚° (ì—ë””í„° ì¢Œí‘œ)
+                int startX = Mathf.Min(dragStart.x, currentEditorMouse.x);
+                int startY = Mathf.Min(dragStart.y, currentEditorMouse.y);
+                int endX = Mathf.Max(dragStart.x, currentEditorMouse.x);
+                int endY = Mathf.Max(dragStart.y, currentEditorMouse.y);
+
+                // ì‹œê°ì  íš¨ê³¼ (ëª¨ë“  ì…€ ë° í…Œë‘ë¦¬ ê·¸ë¦¬ê¸°)
                 for (int x = startX; x <= endX; x++)
                 {
                     for (int y = startY; y <= endY; y++)
@@ -156,31 +165,31 @@ namespace Project.Scripts.Editor
                         {
                             Rect cellRect = new Rect(x * gridSize, y * gridSize, gridSize - 1, gridSize - 1);
 
-                            // ¹è°æ »ö»ó (¼±ÅÃµÈ »ö»ó ¹İÅõ¸í)
+                            // ë°°ê²½ ìƒ‰ìƒ (ì„ íƒëœ ìƒ‰ìƒ ë°˜íˆ¬ëª…)
                             Color prevColor = GUI.color;
                             Color selectedBlockColor = GetColorFromType(selectedColor);
                             GUI.color = new Color(selectedBlockColor.r, selectedBlockColor.g, selectedBlockColor.b, 0.3f);
                             GUI.DrawTexture(cellRect, EditorGUIUtility.whiteTexture);
 
-                            // Å×µÎ¸® (´õ ÁøÇÑ »ö»ó)
+                            // í…Œë‘ë¦¬ (ë” ì§„í•œ ìƒ‰ìƒ)
                             if (x == startX || x == endX || y == startY || y == endY)
                             {
                                 GUI.color = new Color(selectedBlockColor.r, selectedBlockColor.g, selectedBlockColor.b, 0.8f);
                                 float borderWidth = 2f;
 
-                                // »ó´Ü Å×µÎ¸®
+                                // ìƒë‹¨ í…Œë‘ë¦¬
                                 if (y == startY)
                                     GUI.DrawTexture(new Rect(cellRect.x, cellRect.y, cellRect.width, borderWidth), EditorGUIUtility.whiteTexture);
 
-                                // ¿ŞÂÊ Å×µÎ¸®
+                                // ì™¼ìª½ í…Œë‘ë¦¬
                                 if (x == startX)
                                     GUI.DrawTexture(new Rect(cellRect.x, cellRect.y, borderWidth, cellRect.height), EditorGUIUtility.whiteTexture);
 
-                                // ÇÏ´Ü Å×µÎ¸®
+                                // í•˜ë‹¨ í…Œë‘ë¦¬
                                 if (y == endY)
                                     GUI.DrawTexture(new Rect(cellRect.x, cellRect.y + cellRect.height - borderWidth, cellRect.width, borderWidth), EditorGUIUtility.whiteTexture);
 
-                                // ¿À¸¥ÂÊ Å×µÎ¸®
+                                // ì˜¤ë¥¸ìª½ í…Œë‘ë¦¬
                                 if (x == endX)
                                     GUI.DrawTexture(new Rect(cellRect.x + cellRect.width - borderWidth, cellRect.y, borderWidth, cellRect.height), EditorGUIUtility.whiteTexture);
                             }
@@ -191,31 +200,35 @@ namespace Project.Scripts.Editor
                 }
             }
 
-            // º¸µå ºí·Ï ÀÚÀ¯ ¸ğ¾ç ¸ğµå¿¡¼­ ¼±ÅÃµÈ ¼¿ Ç¥½Ã
+            // ë³´ë“œ ë¸”ë¡ ììœ  ëª¨ì–‘ ëª¨ë“œì—ì„œ ì„ íƒëœ ì…€ í‘œì‹œ
             if (currentTool == EditTool.BoardBlock && boardBlockMode == BoardBlockMode.FreeForm)
             {
                 foreach (var cell in selectedBoardCells)
                 {
-                    if (cell.x >= 0 && cell.x < gridWidth && cell.y >= 0 && cell.y < gridHeight)
+                    // ì—¬ê¸°ì„œ cell ì¢Œí‘œëŠ” ì›”ë“œ ì¢Œí‘œì¼ ìˆ˜ ìˆìŒ
+                    // ì—ë””í„° ì¢Œí‘œë¡œ ë³€í™˜í•˜ì—¬ í‘œì‹œ
+                    int editorX = cell.x;
+                    int editorY = WorldToEditorY(cell.y);
+                    if (editorX >= 0 && editorX < gridWidth && editorY >= 0 && editorY < gridHeight)
                     {
                         Rect cellRect = new Rect(
-                            cell.x * gridSize,
-                            cell.y * gridSize,
+                            editorX * gridSize,
+                            editorY * gridSize,
                             gridSize - 1,
                             gridSize - 1
                         );
 
-                        // ¼±ÅÃµÈ ¼¿ Ç¥½Ã
+                        // ì„ íƒëœ ì…€ í‘œì‹œ
                         Color prevColor = GUI.color;
 
-                        // ¼±ÅÃµÈ »ö»ó ±â¹İ Ç¥½Ã
+                        // ì„ íƒëœ ìƒ‰ìƒ ê¸°ë°˜ í‘œì‹œ
                         Color selectedBlockColor = GetColorFromType(selectedColor);
 
-                        // ¹è°æ (¹İÅõ¸í)
+                        // ë°°ê²½ (ë°˜íˆ¬ëª…)
                         GUI.color = new Color(selectedBlockColor.r, selectedBlockColor.g, selectedBlockColor.b, 0.3f);
                         GUI.DrawTexture(cellRect, EditorGUIUtility.whiteTexture);
 
-                        // Å×µÎ¸® (´õ ÁøÇÑ »ö»ó)
+                        // í…Œë‘ë¦¬ (ë” ì§„í•œ ìƒ‰ìƒ)
                         GUI.color = new Color(selectedBlockColor.r, selectedBlockColor.g, selectedBlockColor.b, 0.8f);
                         float borderWidth = 2f;
                         GUI.DrawTexture(new Rect(cellRect.x, cellRect.y, cellRect.width, borderWidth), EditorGUIUtility.whiteTexture);
@@ -228,16 +241,23 @@ namespace Project.Scripts.Editor
                 }
             }
 
-            // ÇöÀç µå·¡±× ¿µ¿ª Ç¥½Ã - ÇÃ·¹ÀÌ ºí·Ï »ç°¢Çü ¸ğµåÀÏ ¶§
+            // í˜„ì¬ ë“œë˜ê·¸ ì˜ì—­ í‘œì‹œ - í”Œë ˆì´ ë¸”ë¡ ì‚¬ê°í˜• ëª¨ë“œì¼ ë•Œ
             if (startDragPosition.HasValue && currentTool == EditTool.PlayingBlock && playingBlockMode == PlayingBlockMode.Rectangle)
             {
-                // µå·¡±× ¿µ¿ª °è»ê - ÀúÀåµÈ ¸¶¿ì½º À§Ä¡ »ç¿ë
-                int startX = Mathf.Min(startDragPosition.Value.x, currentMouseGridPos.x);
-                int startY = Mathf.Min(startDragPosition.Value.y, currentMouseGridPos.y);
-                int endX = Mathf.Max(startDragPosition.Value.x, currentMouseGridPos.x);
-                int endY = Mathf.Max(startDragPosition.Value.y, currentMouseGridPos.y);
+                // ë“œë˜ê·¸ ì‹œì‘ì (ì—ë””í„° ì¢Œí‘œ)
+                Vector2Int dragStart = startDragPosition.Value;
 
-                // ½Ã°¢Àû È¿°ú (¸ğµç ¼¿ ¹× Å×µÎ¸® ±×¸®±â)
+                // í˜„ì¬ ë§ˆìš°ìŠ¤ ìœ„ì¹˜(ì—ë””í„° ì¢Œí‘œë¡œ ë³€í™˜)
+                int currentEditorMouseY = WorldToEditorY(currentMouseGridPos.y);
+                Vector2Int currentEditorMouse = new Vector2Int(currentMouseGridPos.x, currentEditorMouseY);
+
+                // ë“œë˜ê·¸ ì˜ì—­ ê³„ì‚°
+                int startX = Mathf.Min(dragStart.x, currentEditorMouse.x);
+                int startY = Mathf.Min(dragStart.y, currentEditorMouse.y);
+                int endX = Mathf.Max(dragStart.x, currentEditorMouse.x);
+                int endY = Mathf.Max(dragStart.y, currentEditorMouse.y);
+
+                // ì‹œê°ì  íš¨ê³¼ (ëª¨ë“  ì…€ ë° í…Œë‘ë¦¬ ê·¸ë¦¬ê¸°)
                 for (int x = startX; x <= endX; x++)
                 {
                     for (int y = startY; y <= endY; y++)
@@ -246,30 +266,30 @@ namespace Project.Scripts.Editor
                         {
                             Rect cellRect = new Rect(x * gridSize, y * gridSize, gridSize - 1, gridSize - 1);
 
-                            // ¹è°æ »ö»ó (ÆÄ¶õ»ö ¹İÅõ¸í)
+                            // ë°°ê²½ ìƒ‰ìƒ (íŒŒë€ìƒ‰ ë°˜íˆ¬ëª…)
                             Color prevColor = GUI.color;
                             GUI.color = new Color(0.3f, 0.6f, 1.0f, 0.25f);
                             GUI.DrawTexture(cellRect, EditorGUIUtility.whiteTexture);
 
-                            // Å×µÎ¸® (´õ ÁøÇÑ ÆÄ¶õ»ö)
+                            // í…Œë‘ë¦¬ (ë” ì§„í•œ íŒŒë€ìƒ‰)
                             if (x == startX || x == endX || y == startY || y == endY)
                             {
                                 GUI.color = new Color(0.3f, 0.6f, 1.0f, 0.8f);
                                 float borderWidth = 2f;
 
-                                // »ó´Ü Å×µÎ¸®
+                                // ìƒë‹¨ í…Œë‘ë¦¬
                                 if (y == startY)
                                     GUI.DrawTexture(new Rect(cellRect.x, cellRect.y, cellRect.width, borderWidth), EditorGUIUtility.whiteTexture);
 
-                                // ¿ŞÂÊ Å×µÎ¸®
+                                // ì™¼ìª½ í…Œë‘ë¦¬
                                 if (x == startX)
                                     GUI.DrawTexture(new Rect(cellRect.x, cellRect.y, borderWidth, cellRect.height), EditorGUIUtility.whiteTexture);
 
-                                // ÇÏ´Ü Å×µÎ¸®
+                                // í•˜ë‹¨ í…Œë‘ë¦¬
                                 if (y == endY)
                                     GUI.DrawTexture(new Rect(cellRect.x, cellRect.y + cellRect.height - borderWidth, cellRect.width, borderWidth), EditorGUIUtility.whiteTexture);
 
-                                // ¿À¸¥ÂÊ Å×µÎ¸®
+                                // ì˜¤ë¥¸ìª½ í…Œë‘ë¦¬
                                 if (x == endX)
                                     GUI.DrawTexture(new Rect(cellRect.x + cellRect.width - borderWidth, cellRect.y, borderWidth, cellRect.height), EditorGUIUtility.whiteTexture);
                             }
@@ -280,28 +300,32 @@ namespace Project.Scripts.Editor
                 }
             }
 
-            // ÇÃ·¹ÀÌ ºí·Ï ÀÚÀ¯ ¸ğ¾ç ¸ğµå¿¡¼­ ¼±ÅÃµÈ ¼¿ Ç¥½Ã
+            // í”Œë ˆì´ ë¸”ë¡ ììœ  ëª¨ì–‘ ëª¨ë“œì—ì„œ ì„ íƒëœ ì…€ í‘œì‹œ
             if (currentTool == EditTool.PlayingBlock && playingBlockMode == PlayingBlockMode.FreeForm)
             {
                 foreach (var cell in selectedCells)
                 {
-                    if (cell.x >= 0 && cell.x < gridWidth && cell.y >= 0 && cell.y < gridHeight)
+                    // ì›”ë“œ ì¢Œí‘œë¥¼ ì—ë””í„° ì¢Œí‘œë¡œ ë³€í™˜
+                    int editorX = cell.x;
+                    int editorY = WorldToEditorY(cell.y);
+
+                    if (editorX >= 0 && editorX < gridWidth && editorY >= 0 && editorY < gridHeight)
                     {
                         Rect cellRect = new Rect(
-                            cell.x * gridSize,
-                            cell.y * gridSize,
+                            editorX * gridSize,
+                            editorY * gridSize,
                             gridSize - 1,
                             gridSize - 1
                         );
 
-                        // ¼±ÅÃµÈ ¼¿ Ç¥½Ã
+                        // ì„ íƒëœ ì…€ í‘œì‹œ
                         Color prevColor = GUI.color;
 
-                        // ¹è°æ (¹İÅõ¸í ³ì»ö)
+                        // ë°°ê²½ (ë°˜íˆ¬ëª… ë…¹ìƒ‰)
                         GUI.color = new Color(0.3f, 0.8f, 0.3f, 0.3f);
                         GUI.DrawTexture(cellRect, EditorGUIUtility.whiteTexture);
 
-                        // Å×µÎ¸® (´õ ÁøÇÑ ³ì»ö)
+                        // í…Œë‘ë¦¬ (ë” ì§„í•œ ë…¹ìƒ‰)
                         GUI.color = new Color(0.3f, 0.8f, 0.3f, 0.8f);
                         float borderWidth = 2f;
                         GUI.DrawTexture(new Rect(cellRect.x, cellRect.y, cellRect.width, borderWidth), EditorGUIUtility.whiteTexture);
@@ -309,10 +333,10 @@ namespace Project.Scripts.Editor
                         GUI.DrawTexture(new Rect(cellRect.x, cellRect.y + cellRect.height - borderWidth, cellRect.width, borderWidth), EditorGUIUtility.whiteTexture);
                         GUI.DrawTexture(new Rect(cellRect.x + cellRect.width - borderWidth, cellRect.y, borderWidth, cellRect.height), EditorGUIUtility.whiteTexture);
 
-                        // Ã¹ ¹øÂ° ¼±ÅÃÇÑ ¼¿(Áß½É)Àº Æ¯º°ÇÑ Ç¥½Ã Ãß°¡
+                        // ì²« ë²ˆì§¸ ì„ íƒí•œ ì…€(ì¤‘ì‹¬)ì€ íŠ¹ë³„í•œ í‘œì‹œ ì¶”ê°€
                         if (selectedCells.Count > 0 && cell == selectedCells[0])
                         {
-                            // Áß½ÉÁ¡ Ç¥½Ã (ÀÛÀº »ç°¢Çü)
+                            // ì¤‘ì‹¬ì  í‘œì‹œ (ì‘ì€ ì‚¬ê°í˜•)
                             GUI.color = new Color(0.3f, 0.8f, 0.3f, 0.9f);
                             float centerSize = cellRect.width * 0.3f;
                             Rect centerRect = new Rect(
@@ -336,16 +360,17 @@ namespace Project.Scripts.Editor
         {
             foreach (var block in boardBlocks)
             {
-                if (block.x == x && block.y == y && block.ColorType != ColorType.None)
+                // ì—¬ê¸°ì„œ block.yë¥¼ ì—ë””í„° ì¢Œí‘œë¡œ ë³€í™˜í•´ì„œ ë¹„êµ
+                if (block.x == x && WorldToEditorY(block.y) == y)
                 {
                     Color guiColor = GUI.color;
                     GUI.color = GetColorFromType(block.ColorType);
                     GUI.DrawTexture(cellRect, colorTextures[(int)block.ColorType]);
                     GUI.color = guiColor;
 
-                    // ÁÂÇ¥ Ç¥½Ã
+                    // ì¢Œí‘œ í‘œì‹œ
                     GUI.Label(new Rect(cellRect.x + 2, cellRect.y + 2, 30, 20),
-        $"{block.x},{block.y}", new GUIStyle() { normal = { textColor = Color.white } });
+                        $"{block.x},{block.y}", new GUIStyle() { normal = { textColor = Color.white } });
                 }
             }
         }
@@ -358,39 +383,44 @@ namespace Project.Scripts.Editor
                 {
                     int blockX = block.center.x + shape.offset.x;
                     int blockY = block.center.y + shape.offset.y;
-                    if (blockX == x && blockY == y)
+
+                    // ì›”ë“œ ì¢Œí‘œë¥¼ ì—ë””í„° ì¢Œí‘œë¡œ ë³€í™˜í•˜ì—¬ ë¹„êµ
+                    int editorBlockY = WorldToEditorY(blockY);
+
+                    if (blockX == x && editorBlockY == y)
                     {
+                        // ê¸°ì¡´ ê·¸ë¦¬ê¸° ì½”ë“œ...
                         Color guiColor = GUI.color;
 
-                        // ÇÃ·¹ÀÌ ºí·Ï »ö»ó ±×¸®±â
+                        // í”Œë ˆì´ ë¸”ë¡ ìƒ‰ìƒ ê·¸ë¦¬ê¸°
                         GUI.color = GetColorFromType(block.ColorType);
                         GUI.DrawTexture(cellRect, colorTextures[(int)block.ColorType]);
 
-                        // Å×µÎ¸® Ãß°¡ - ¸Ş¼­µå È£Ãâ Ãß°¡
+                        // í…Œë‘ë¦¬ ì¶”ê°€
                         DrawPlayingBlockBorder(cellRect);
 
-                        // ÇöÀç ¼±ÅÃµÈ ºí·ÏÀÌ¸é ÇÏÀÌ¶óÀÌÆ®
+                        // í˜„ì¬ ì„ íƒëœ ë¸”ë¡ì´ë©´ í•˜ì´ë¼ì´íŠ¸
                         if (blockIndex == currentPlayingBlockIndex)
                         {
                             GUI.color = new Color(1f, 1f, 1f, 0.3f);
                             GUI.DrawTextureWithTexCoords(cellRect, playingBlockPatternTexture,
-                                new Rect(0, 0, cellRect.width / 4, cellRect.height / 4)); // ¹İº¹ Å©±â Á¶Á¤
+                                new Rect(0, 0, cellRect.width / 4, cellRect.height / 4));
                         }
-                       
-                        // ºí·Ï Áß½É Ç¥½Ã
+
+                        // ë¸”ë¡ ì¤‘ì‹¬ í‘œì‹œ
                         if (shape.offset.x == 0 && shape.offset.y == 0)
                         {
                             GUI.DrawTexture(new Rect(cellRect.x + cellRect.width * 0.25f, cellRect.y + cellRect.height * 0.25f,
                                 cellRect.width * 0.5f, cellRect.height * 0.5f),
                                 EditorGUIUtility.whiteTexture);
 
-                            // ÀÎµ¦½º Ç¥½Ã
+                            // ì¸ë±ìŠ¤ í‘œì‹œ
                             GUI.Label(new Rect(cellRect.x + cellRect.width * 0.4f, cellRect.y + cellRect.height * 0.4f,
                                 cellRect.width * 0.2f, cellRect.height * 0.2f),
                                 $"{blockIndex}", new GUIStyle() { normal = { textColor = Color.white } });
                         }
 
-                        // ±â¹Í Ç¥½Ã
+                        // ê¸°ë¯¹ í‘œì‹œ
                         if (block.gimmicks != null && block.gimmicks.Count > 0)
                         {
                             foreach (var gimmick in block.gimmicks)
@@ -402,7 +432,7 @@ namespace Project.Scripts.Editor
                                         cellRect.width * 0.25f, cellRect.height * 0.25f),
                                         gimmickTexture);
 
-                                    // ±â¹Í Å¸ÀÔ Ç¥½Ã
+                                    // ê¸°ë¯¹ íƒ€ì… í‘œì‹œ
                                     GUI.Label(new Rect(cellRect.x + cellRect.width * 0.6f, cellRect.y,
                                         cellRect.width * 0.4f, cellRect.height * 0.2f),
                                         gimmick.gimmickType.Substring(0, 1),
@@ -416,17 +446,17 @@ namespace Project.Scripts.Editor
                 }
             }
         }
-  
+
         private void DrawPlayingBlockBorder(Rect cellRect)
         {
-            // ÇÃ·¹ÀÌ ºí·Ï Å×µÎ¸® ±×¸®±â
+            // í”Œë ˆì´ ë¸”ë¡ í…Œë‘ë¦¬ ê·¸ë¦¬ê¸°
             Color prevColor = GUI.color;
-            GUI.color = new Color(1f, 1f, 1f, 0.9f); // Èò»ö Å×µÎ¸®
+            GUI.color = new Color(1f, 1f, 1f, 0.9f); // í°ìƒ‰ í…Œë‘ë¦¬
 
-            float borderWidth = 2f; // µÎ²¨¿î Å×µÎ¸®
-            float inset = 3f;      // ¾à°£ ¾ÈÂÊÀ¸·Î
+            float borderWidth = 2f; // ë‘êº¼ìš´ í…Œë‘ë¦¬
+            float inset = 3f;      // ì•½ê°„ ì•ˆìª½ìœ¼ë¡œ
 
-            // Å×µÎ¸® »ç°¢Çü (¾ÈÂÊ¿¡ ´õ ÀÛÀº »ç°¢Çü)
+            // í…Œë‘ë¦¬ ì‚¬ê°í˜• (ì•ˆìª½ì— ë” ì‘ì€ ì‚¬ê°í˜•)
             Rect borderRect = new Rect(
                 cellRect.x + inset,
                 cellRect.y + inset,
@@ -434,7 +464,7 @@ namespace Project.Scripts.Editor
                 cellRect.height - (inset * 2)
             );
 
-            // »óÇÏÁÂ¿ì Å×µÎ¸® ±×¸®±â
+            // ìƒí•˜ì¢Œìš° í…Œë‘ë¦¬ ê·¸ë¦¬ê¸°
             GUI.DrawTexture(new Rect(borderRect.x, borderRect.y, borderRect.width, borderWidth), EditorGUIUtility.whiteTexture);
             GUI.DrawTexture(new Rect(borderRect.x, borderRect.y, borderWidth, borderRect.height), EditorGUIUtility.whiteTexture);
             GUI.DrawTexture(new Rect(borderRect.x, borderRect.y + borderRect.height - borderWidth, borderRect.width, borderWidth), EditorGUIUtility.whiteTexture);
@@ -444,71 +474,373 @@ namespace Project.Scripts.Editor
         }
         private void DrawwallsOnGrid(int x, int y, Rect cellRect)
         {
+            // í˜„ì¬ ì…€ì— ëŒ€í•œ ë²½ ì •ë³´ ì²˜ë¦¬
             foreach (var wall in walls)
             {
-                if (wall.x == x && wall.y == y)
-                {
-                    // º® ¹æÇâ¿¡ µû¶ó ±×¸®±â
-                    Rect wallRect = cellRect;
+                // ë²½ì˜ ì‹œì‘ì ì¸ì§€ í™•ì¸ (ë°ì´í„°ì˜ ì›”ë“œ Yë¥¼ ì—ë””í„° Yë¡œ ë³€í™˜í•˜ì—¬ ë¹„êµ)
+                bool isWallStartCell = (wall.x == x && WorldToEditorY(wall.y) == y);
 
+                // ë²½ì˜ í™•ì¥ ì˜ì—­ ì •ë³´
+                bool isWallExtension = false;
+
+                // í™•ì¥ëœ ë²½ì¸ ê²½ìš° í™•ì¥ ì˜ì—­ ê³„ì‚°
+                if (wall.Length > 1)
+                {
+                    // ë²½ ë°©í–¥ì— ë”°ë¼ í™•ì¥ ì…€ í™•ì¸
                     switch (wall.WallDirection)
                     {
+                        // ìœ„ìª½/ì•„ë˜ìª½ íƒ€ì…ë“¤ì€ ì˜¤ë¥¸ìª½ìœ¼ë¡œ í™•ì¥ (ìˆ˜í‰ í™•ì¥)
                         case ObjectPropertiesEnum.WallDirection.Single_Up:
-                            wallRect = new Rect(cellRect.x, cellRect.y, cellRect.width, cellRect.height * 0.1f);
-                            break;
                         case ObjectPropertiesEnum.WallDirection.Single_Down:
-                            wallRect = new Rect(cellRect.x, cellRect.y + cellRect.height * 0.9f, cellRect.width, cellRect.height * 0.1f);
+                        case ObjectPropertiesEnum.WallDirection.Left_Up:
+                        case ObjectPropertiesEnum.WallDirection.Left_Down:
+                        case ObjectPropertiesEnum.WallDirection.Right_Up:
+                        case ObjectPropertiesEnum.WallDirection.Right_Down:
+                        case ObjectPropertiesEnum.WallDirection.Open_Up:
+                        case ObjectPropertiesEnum.WallDirection.Open_Down:
+                            for (int i = 1; i < wall.Length; i++)
+                            {
+                                if (wall.x + i == x && WorldToEditorY(wall.y) == y)
+                                {
+                                    isWallExtension = true;
+                                    break;
+                                }
+                            }
                             break;
+
+                        // ì™¼ìª½/ì˜¤ë¥¸ìª½ íƒ€ì…ë“¤ì€ ì•„ë˜ìª½ìœ¼ë¡œ í™•ì¥ (ìˆ˜ì§ í™•ì¥)
                         case ObjectPropertiesEnum.WallDirection.Single_Left:
-                            wallRect = new Rect(cellRect.x, cellRect.y, cellRect.width * 0.1f, cellRect.height);
-                            break;
                         case ObjectPropertiesEnum.WallDirection.Single_Right:
-                            wallRect = new Rect(cellRect.x + cellRect.width * 0.9f, cellRect.y, cellRect.width * 0.1f, cellRect.height);
+                        case ObjectPropertiesEnum.WallDirection.Open_Left:
+                        case ObjectPropertiesEnum.WallDirection.Open_Right:
+                            for (int i = 1; i < wall.Length; i++)
+                            {
+                                if (wall.x == x && WorldToEditorY(wall.y + i) == y)
+                                {
+                                    isWallExtension = true;
+                                    break;
+                                }
+                            }
                             break;
-                        default:
-                            // ´Ù¸¥ º® ¹æÇâ¿¡ ´ëÇÑ Ã³¸®
-                            break;
                     }
+                }
 
-                    Color guiColor = GUI.color;
+                // 1. ë²½ì˜ ì‹œì‘ì ì´ë©´ ë²½ ë° ê¸°ë¯¹ ê·¸ë¦¬ê¸°
+                if (isWallStartCell)
+                {
+                    // ë²½ ê·¸ë¦¬ê¸°
+                    DrawWallSegment(x, y, cellRect, wall, false);
 
-                    // º® »ö»ó
-                    if (wall.wallColor != ColorType.None)
+                    // ë²½ ê¸°ë¯¹ ê·¸ë¦¬ê¸° (ì‹œì‘ì ì—ë§Œ)
+                    if (wall.WallGimmickType != WallGimmickType.None)
                     {
-                        GUI.color = GetColorFromType(wall.wallColor);
+                        DrawWallGimmick(cellRect, wall);
                     }
-                    else
-                    {
-                        GUI.color = Color.gray;
-                    }
-
-                    GUI.DrawTexture(wallRect, wallTexture);
-
-                    // ±æÀÌ Ç¥½Ã
-                    if (wall.Length > 1)
-                    {
-                        GUI.Label(new Rect(cellRect.x + 2, cellRect.y + 2, 30, 20),
-                            $"L{wall.Length}", new GUIStyle() { normal = { textColor = Color.white } });
-                    }
-
-                    GUI.color = guiColor;
+                }
+                // 2. ë²½ì˜ í™•ì¥ ì˜ì—­ì´ë©´ í•´ë‹¹ ë¶€ë¶„ë§Œ ê·¸ë¦¬ê¸°
+                else if (isWallExtension)
+                {
+                    // í™•ì¥ ì˜ì—­ ë²½ ê·¸ë¦¬ê¸°
+                    DrawWallSegment(x, y, cellRect, wall, true);
                 }
             }
         }
 
+        // ë²½ ì„¸ê·¸ë¨¼íŠ¸ ê·¸ë¦¬ê¸° í—¬í¼ ë©”ì„œë“œ
+        private void DrawWallSegment(int x, int y, Rect cellRect, WallData wall, bool isExtension)
+        {
+            // ë²½ ë°©í–¥ì— ë”°ë¼ ê·¸ë¦¬ê¸° ì˜ì—­ ê³„ì‚°
+            Rect wallRect = cellRect;
+
+            switch (wall.WallDirection)
+            {
+                // ìœ„ìª½ íƒ€ì…ë“¤ (ìƒë‹¨ì— ë²½)
+                case ObjectPropertiesEnum.WallDirection.Single_Up:
+                case ObjectPropertiesEnum.WallDirection.Left_Up:
+                case ObjectPropertiesEnum.WallDirection.Right_Up:
+                case ObjectPropertiesEnum.WallDirection.Open_Up:
+                    wallRect = new Rect(cellRect.x, cellRect.y, cellRect.width, cellRect.height * 0.1f);
+                    break;
+
+                // ì•„ë˜ìª½ íƒ€ì…ë“¤ (í•˜ë‹¨ì— ë²½)
+                case ObjectPropertiesEnum.WallDirection.Single_Down:
+                case ObjectPropertiesEnum.WallDirection.Left_Down:
+                case ObjectPropertiesEnum.WallDirection.Right_Down:
+                case ObjectPropertiesEnum.WallDirection.Open_Down:
+                    wallRect = new Rect(cellRect.x, cellRect.y + cellRect.height * 0.9f, cellRect.width, cellRect.height * 0.1f);
+                    break;
+
+                // ì™¼ìª½ íƒ€ì…ë“¤ (ì¢Œì¸¡ì— ë²½)
+                case ObjectPropertiesEnum.WallDirection.Single_Left:
+                case ObjectPropertiesEnum.WallDirection.Open_Left:
+                    wallRect = new Rect(cellRect.x, cellRect.y, cellRect.width * 0.1f, cellRect.height);
+                    break;
+
+                // ì˜¤ë¥¸ìª½ íƒ€ì…ë“¤ (ìš°ì¸¡ì— ë²½)
+                case ObjectPropertiesEnum.WallDirection.Single_Right:
+                case ObjectPropertiesEnum.WallDirection.Open_Right:
+                    wallRect = new Rect(cellRect.x + cellRect.width * 0.9f, cellRect.y, cellRect.width * 0.1f, cellRect.height);
+                    break;
+            }
+
+            // ë²½ ìƒ‰ìƒ ì„¤ì • ë° ê·¸ë¦¬ê¸°
+            Color guiColor = GUI.color;
+
+            // ë²½ ìƒ‰ìƒ
+            if (wall.wallColor != ColorType.None)
+            {
+                GUI.color = GetColorFromType(wall.wallColor);
+            }
+            else
+            {
+                GUI.color = Color.gray;
+            }
+
+            // ë²½ í…ìŠ¤ì²˜ ê·¸ë¦¬ê¸°
+            GUI.DrawTexture(wallRect, wallTexture);
+
+            // ë²½ì˜ ì‹œì‘ì ì—ë§Œ ê¸¸ì´ í‘œì‹œ
+            if (!isExtension && wall.Length > 1)
+            {
+                // ê¸¸ì´ í…ìŠ¤íŠ¸ í‘œì‹œ
+                GUI.color = Color.white;
+                GUI.Label(new Rect(cellRect.x + 2, cellRect.y + 2, 30, 20),
+                    $"L{wall.Length}", new GUIStyle() { normal = { textColor = Color.white } });
+
+                // í™•ì¥ ë°©í–¥ í™”ì‚´í‘œ
+                string directionSymbol = "";
+                Vector2 symbolPos = Vector2.zero;
+
+                switch (wall.WallDirection)
+                {
+                    // ìœ„ìª½/ì•„ë˜ìª½ íƒ€ì…ë“¤ì€ ì˜¤ë¥¸ìª½ìœ¼ë¡œ í™•ì¥
+                    case ObjectPropertiesEnum.WallDirection.Single_Up:
+                    case ObjectPropertiesEnum.WallDirection.Single_Down:
+                    case ObjectPropertiesEnum.WallDirection.Left_Up:
+                    case ObjectPropertiesEnum.WallDirection.Left_Down:
+                    case ObjectPropertiesEnum.WallDirection.Right_Up:
+                    case ObjectPropertiesEnum.WallDirection.Right_Down:
+                    case ObjectPropertiesEnum.WallDirection.Open_Up:
+                    case ObjectPropertiesEnum.WallDirection.Open_Down:
+                        directionSymbol = "â†’"; // ì˜¤ë¥¸ìª½ í™”ì‚´í‘œ
+                        symbolPos = new Vector2(cellRect.x + cellRect.width - 20, cellRect.y + cellRect.height * 0.5f - 10);
+                        break;
+
+                    // ì™¼ìª½/ì˜¤ë¥¸ìª½ íƒ€ì…ë“¤ì€ ì•„ë˜ìª½ìœ¼ë¡œ í™•ì¥
+                    case ObjectPropertiesEnum.WallDirection.Single_Left:
+                    case ObjectPropertiesEnum.WallDirection.Single_Right:
+                    case ObjectPropertiesEnum.WallDirection.Open_Left:
+                    case ObjectPropertiesEnum.WallDirection.Open_Right:
+                        directionSymbol = "â†‘"; // ìœ„ í™”ì‚´í‘œ
+                        symbolPos = new Vector2(cellRect.x + cellRect.width * 0.5f - 10, cellRect.y + cellRect.height - 20);
+                        break;
+                }
+
+                // í™”ì‚´í‘œ í‘œì‹œ
+                GUI.Label(new Rect(symbolPos.x, symbolPos.y, 20, 20),
+                    directionSymbol, new GUIStyle()
+                    {
+                        normal = { textColor = Color.white },
+                        fontSize = 15,
+                        fontStyle = FontStyle.Bold,
+                        alignment = TextAnchor.MiddleCenter
+                    });
+            }
+
+            // ì„ íƒëœ ë²½ í•˜ì´ë¼ì´íŠ¸
+            if (walls.IndexOf(wall) == currentWallIndex)
+            {
+                // ë²½ ì£¼ë³€ì— í•˜ì´ë¼ì´íŠ¸ í‘œì‹œ
+                GUI.color = new Color(1f, 1f, 0.5f, 0.5f);
+
+                // ë²½ ë°©í–¥ì— ë”°ë¼ í•˜ì´ë¼ì´íŠ¸ ìœ„ì¹˜ ì¡°ì •
+                float highlightThickness = 2f;
+                switch (wall.WallDirection)
+                {
+                    case ObjectPropertiesEnum.WallDirection.Single_Up:
+                    case ObjectPropertiesEnum.WallDirection.Left_Up:
+                    case ObjectPropertiesEnum.WallDirection.Right_Up:
+                    case ObjectPropertiesEnum.WallDirection.Open_Up:
+                        // ìœ„ìª½ ë²½ì˜ ê²½ìš° í•˜ì´ë¼ì´íŠ¸
+                        GUI.DrawTexture(new Rect(
+                            cellRect.x,
+                            cellRect.y + cellRect.height * 0.1f,
+                            cellRect.width,
+                            highlightThickness),
+                            EditorGUIUtility.whiteTexture);
+                        break;
+
+                    case ObjectPropertiesEnum.WallDirection.Single_Down:
+                    case ObjectPropertiesEnum.WallDirection.Left_Down:
+                    case ObjectPropertiesEnum.WallDirection.Right_Down:
+                    case ObjectPropertiesEnum.WallDirection.Open_Down:
+                        // ì•„ë˜ìª½ ë²½ì˜ ê²½ìš° í•˜ì´ë¼ì´íŠ¸
+                        GUI.DrawTexture(new Rect(
+                            cellRect.x,
+                            cellRect.y + cellRect.height * 0.9f - highlightThickness,
+                            cellRect.width,
+                            highlightThickness),
+                            EditorGUIUtility.whiteTexture);
+                        break;
+
+                    case ObjectPropertiesEnum.WallDirection.Single_Left:
+                    case ObjectPropertiesEnum.WallDirection.Open_Left:
+                        // ì™¼ìª½ ë²½ì˜ ê²½ìš° í•˜ì´ë¼ì´íŠ¸
+                        GUI.DrawTexture(new Rect(
+                            cellRect.x + cellRect.width * 0.1f,
+                            cellRect.y,
+                            highlightThickness,
+                            cellRect.height),
+                            EditorGUIUtility.whiteTexture);
+                        break;
+
+                    case ObjectPropertiesEnum.WallDirection.Single_Right:
+                    case ObjectPropertiesEnum.WallDirection.Open_Right:
+                        // ì˜¤ë¥¸ìª½ ë²½ì˜ ê²½ìš° í•˜ì´ë¼ì´íŠ¸
+                        GUI.DrawTexture(new Rect(
+                            cellRect.x + cellRect.width * 0.9f - highlightThickness,
+                            cellRect.y,
+                            highlightThickness,
+                            cellRect.height),
+                            EditorGUIUtility.whiteTexture);
+                        break;
+                }
+            }
+
+            // GUI ìƒ‰ìƒ ë³µì›
+            GUI.color = guiColor;
+        }
+
+        // ë²½ ê¸°ë¯¹ ê·¸ë¦¬ê¸° í—¬í¼ ë©”ì„œë“œ
+        private void DrawWallGimmick(Rect cellRect, WallData wall)
+        {
+            if (wall.WallGimmickType == WallGimmickType.None)
+                return;
+
+            Color guiColor = GUI.color;
+
+            // ë²½ ë°©í–¥ì— ë”°ë¼ ê¸°ë¯¹ ì•„ì´ì½˜ ìœ„ì¹˜ ì¡°ì •
+            Rect gimmickRect;
+
+            switch (wall.WallDirection)
+            {
+                case ObjectPropertiesEnum.WallDirection.Single_Up:
+                case ObjectPropertiesEnum.WallDirection.Left_Up:
+                case ObjectPropertiesEnum.WallDirection.Right_Up:
+                case ObjectPropertiesEnum.WallDirection.Open_Up:
+                    // ìœ„ìª½ ë²½ì˜ ê²½ìš° ì•„ì´ì½˜ ìœ„ì¹˜
+                    gimmickRect = new Rect(
+                        cellRect.x + cellRect.width * 0.75f,
+                        cellRect.y + cellRect.height * 0.15f,
+                        cellRect.width * 0.2f,
+                        cellRect.height * 0.2f
+                    );
+                    break;
+                case ObjectPropertiesEnum.WallDirection.Single_Down:
+                case ObjectPropertiesEnum.WallDirection.Left_Down:
+                case ObjectPropertiesEnum.WallDirection.Right_Down:
+                case ObjectPropertiesEnum.WallDirection.Open_Down:
+                    // ì•„ë˜ìª½ ë²½ì˜ ê²½ìš° ì•„ì´ì½˜ ìœ„ì¹˜
+                    gimmickRect = new Rect(
+                        cellRect.x + cellRect.width * 0.75f,
+                        cellRect.y + cellRect.height * 0.65f,
+                        cellRect.width * 0.2f,
+                        cellRect.height * 0.2f
+                    );
+                    break;
+                case ObjectPropertiesEnum.WallDirection.Single_Left:
+                case ObjectPropertiesEnum.WallDirection.Open_Left:
+                    // ì™¼ìª½ ë²½ì˜ ê²½ìš° ì•„ì´ì½˜ ìœ„ì¹˜
+                    gimmickRect = new Rect(
+                        cellRect.x + cellRect.width * 0.15f,
+                        cellRect.y + cellRect.height * 0.75f,
+                        cellRect.width * 0.2f,
+                        cellRect.height * 0.2f
+                    );
+                    break;
+                case ObjectPropertiesEnum.WallDirection.Single_Right:
+                case ObjectPropertiesEnum.WallDirection.Open_Right:
+                    // ì˜¤ë¥¸ìª½ ë²½ì˜ ê²½ìš° ì•„ì´ì½˜ ìœ„ì¹˜
+                    gimmickRect = new Rect(
+                        cellRect.x + cellRect.width * 0.65f,
+                        cellRect.y + cellRect.height * 0.75f,
+                        cellRect.width * 0.2f,
+                        cellRect.height * 0.2f
+                    );
+                    break;
+                default:
+                    // ê¸°ë³¸ ìœ„ì¹˜
+                    gimmickRect = new Rect(
+                        cellRect.x + cellRect.width * 0.75f,
+                        cellRect.y + cellRect.height * 0.75f,
+                        cellRect.width * 0.2f,
+                        cellRect.height * 0.2f
+                    );
+                    break;
+            }
+
+            // ê¸°ë¯¹ ì•„ì´ì½˜ ë°°ê²½
+            GUI.color = Color.yellow;
+            GUI.DrawTexture(gimmickRect, gimmickTexture);
+
+            // íŠ¹ì • ê¸°ë¯¹ íƒ€ì…ì— ë”°ë¥¸ ì•„ì´ì½˜ ë³€ê²½
+            string gimmickIcon = "";
+            switch (wall.WallGimmickType)
+            {
+                case WallGimmickType.Star:
+                    gimmickIcon = "â˜…";
+                    break;
+                case WallGimmickType.Lock:
+                    gimmickIcon = "ğŸ”’";
+                    break;
+                case WallGimmickType.Key:
+                    gimmickIcon = "ğŸ”‘";
+                    break;
+                case WallGimmickType.Constraint:
+                    gimmickIcon = "âš“";
+                    break;
+                case WallGimmickType.Multiple:
+                    gimmickIcon = "Ã—";
+                    break;
+                case WallGimmickType.Frozen:
+                    gimmickIcon = "â„";
+                    break;
+                default:
+                    gimmickIcon = "G";
+                    break;
+            }
+
+            // ê¸°ë¯¹ ì•„ì´ì½˜ í‘œì‹œ
+            GUI.color = Color.black;
+            GUI.Label(
+                gimmickRect,
+                gimmickIcon,
+                new GUIStyle()
+                {
+                    normal = { textColor = Color.black },
+                    fontSize = 12,
+                    alignment = TextAnchor.MiddleCenter,
+                    fontStyle = FontStyle.Bold
+                }
+            );
+
+            // GUI ìƒ‰ìƒ ë³µì›
+            GUI.color = guiColor;
+        }
+
         private void DrawHoverAndSelectionEffects()
         {
-            // ¸¶¿ì½º À§Ä¡¸¦ ±×¸®µå ÁÂÇ¥·Î º¯È¯
+            // ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¥¼ ê·¸ë¦¬ë“œ ì¢Œí‘œë¡œ ë³€í™˜
             Vector2 mousePos = Event.current.mousePosition;
             mousePos += scrollPosition;
 
             int gridX = Mathf.FloorToInt(mousePos.x / gridSize);
             int gridY = Mathf.FloorToInt(mousePos.y / gridSize);
 
-            // ±×¸®µå ¹üÀ§ Ã¼Å©
+            // ê·¸ë¦¬ë“œ ë²”ìœ„ ì²´í¬
             if (gridX >= 0 && gridX < gridWidth && gridY >= 0 && gridY < gridHeight)
             {
-                // ¸¶¿ì½º È£¹ö È¿°ú
+                // ë§ˆìš°ìŠ¤ í˜¸ë²„ íš¨ê³¼
                 Rect hoverRect = new Rect(gridX * gridSize, gridY * gridSize, gridSize - 1, gridSize - 1);
 
                 Color prevColor = GUI.color;
@@ -516,30 +848,30 @@ namespace Project.Scripts.Editor
                 GUI.DrawTexture(hoverRect, EditorGUIUtility.whiteTexture);
                 GUI.color = prevColor;
 
-                // µµ±¸ ÈùÆ® Ç¥½Ã
+                // ë„êµ¬ íŒíŠ¸ í‘œì‹œ
                 string hint = "";
                 switch (currentTool)
                 {
                     case EditTool.BoardBlock:
-                        hint = $"º¸µå ºí·Ï ({selectedColor})";
+                        hint = $"ë³´ë“œ ë¸”ë¡ ({selectedColor})";
                         break;
                     case EditTool.PlayingBlock:
-                        hint = $"ÇÃ·¹ÀÌ ºí·Ï ({selectedColor})";
+                        hint = $"í”Œë ˆì´ ë¸”ë¡ ({selectedColor})";
                         break;
                     case EditTool.Wall:
-                        hint = $"º® (¹æÇâ: {GetWallDirectionName(wallDirection)}, ±æÀÌ: {wallLength})";
+                        hint = $"ë²½ (ë°©í–¥: {GetWallDirectionName(wallDirection)}, ê¸¸ì´: {wallLength})";
                         break;
                     case EditTool.Gimmick:
-                        hint = $"±â¹Í ({selectedGimmick})";
+                        hint = $"ê¸°ë¯¹ ({selectedGimmick})";
                         break;
                     case EditTool.Erase:
-                        hint = "Áö¿ì±â";
+                        hint = "ì§€ìš°ê¸°";
                         break;
                 }
 
                 GUI.Label(new Rect(hoverRect.x, hoverRect.y - 20, 200, 20),
-                    $"{gridX}, {gridY} - {hint}",
-                    new GUIStyle() { normal = { textColor = Color.white } });
+           $"{gridX}, {gridY} - {hint}",
+           new GUIStyle() { normal = { textColor = Color.white } });
             }
         }
 
@@ -547,16 +879,16 @@ namespace Project.Scripts.Editor
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
-            EditorGUILayout.LabelField("JSON º¯È¯", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("JSON ë³€í™˜", EditorStyles.boldLabel);
 
-            // JSON ÆÄÀÏ °æ·Î
+            // JSON íŒŒì¼ ê²½ë¡œ
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("ÆÄÀÏ °æ·Î:", GUILayout.Width(100));
+            EditorGUILayout.LabelField("íŒŒì¼ ê²½ë¡œ:", GUILayout.Width(100));
             jsonFilePath = EditorGUILayout.TextField(jsonFilePath);
 
             if (GUILayout.Button("...", GUILayout.Width(30)))
             {
-                string selectedPath = EditorUtility.SaveFilePanel("JSON ÆÄÀÏ °æ·Î", "", "Stage", "json");
+                string selectedPath = EditorUtility.SaveFilePanel("JSON íŒŒì¼ ê²½ë¡œ", "", "Stage", "json");
                 if (!string.IsNullOrEmpty(selectedPath))
                 {
                     jsonFilePath = selectedPath;
@@ -564,37 +896,37 @@ namespace Project.Scripts.Editor
             }
             EditorGUILayout.EndHorizontal();
 
-            // ³»º¸³»±â/°¡Á®¿À±â ¹öÆ°
+            // ë‚´ë³´ë‚´ê¸°/ê°€ì ¸ì˜¤ê¸° ë²„íŠ¼
             EditorGUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("JSONÀ¸·Î ³»º¸³»±â"))
+            if (GUILayout.Button("JSONìœ¼ë¡œ ë‚´ë³´ë‚´ê¸°"))
             {
                 ExportToJson();
             }
 
-            if (GUILayout.Button("JSON¿¡¼­ °¡Á®¿À±â"))
+            if (GUILayout.Button("JSONì—ì„œ ê°€ì ¸ì˜¤ê¸°"))
             {
                 ImportFromJson();
             }
 
             EditorGUILayout.EndHorizontal();
 
-            // ScriptableObject ³»º¸³»±â/°¡Á®¿À±â
+            // ScriptableObject ë‚´ë³´ë‚´ê¸°/ê°€ì ¸ì˜¤ê¸°
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("ScriptableObject º¯È¯", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("ScriptableObject ë³€í™˜", EditorStyles.boldLabel);
 
-            if (GUILayout.Button("ScriptableObject·Î ÀúÀå"))
+            if (GUILayout.Button("ScriptableObjectë¡œ ì €ì¥"))
             {
                 SaveStage();
             }
 
-            if (GUILayout.Button("ScriptableObject¿¡¼­ ºÒ·¯¿À±â"))
+            if (GUILayout.Button("ScriptableObjectì—ì„œ ë¶ˆëŸ¬ì˜¤ê¸°"))
             {
                 LoadStage();
             }
 
-            // ´İ±â ¹öÆ°
-            if (GUILayout.Button("´İ±â"))
+            // ë‹«ê¸° ë²„íŠ¼
+            if (GUILayout.Button("ë‹«ê¸°"))
             {
                 showJsonPanel = false;
             }

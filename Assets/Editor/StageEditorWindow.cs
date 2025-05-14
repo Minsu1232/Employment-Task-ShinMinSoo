@@ -71,7 +71,7 @@ namespace Project.Scripts.Editor
 
         // 기믹 타입
         private string selectedGimmick = "None";
-
+        private int currentWallIndex = -1;
         // 저장된 블록 데이터
         private List<BoardBlockData> boardBlocks = new List<BoardBlockData>();
         private List<PlayingBlockData> playingBlocks = new List<PlayingBlockData>();
@@ -115,29 +115,56 @@ namespace Project.Scripts.Editor
 
         private void OnGUI()
         {
+            // 툴바는 항상 그리기
             DrawToolbar();
 
-            EditorGUILayout.BeginHorizontal();
-
-            // 왼쪽 패널 - 속성
-            EditorGUILayout.BeginVertical(GUILayout.Width(250));
-            DrawPropertyPanel();
-            EditorGUILayout.EndVertical();
-
-            // 오른쪽 패널 - 그리드
-            EditorGUILayout.BeginVertical();
-            DrawGrid();
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.EndHorizontal();
-
-            // JSON 변환 패널
-            if (showJsonPanel)
+            // 미리보기 모드일 때와 아닐 때 다른 처리
+            if (previewMode)
             {
-                DrawJsonPanel();
-            }
+                // 미리보기 모드일 때는 게임 뷰와 간소화된 컨트롤 패널만 표시
+                EditorGUILayout.BeginHorizontal();
 
-            HandleInput();
+                // 왼쪽 패널 - 게임 컨트롤
+                EditorGUILayout.BeginVertical(GUILayout.Width(250));
+                DrawGameControlPanel();
+                EditorGUILayout.EndVertical();
+
+                // 오른쪽 패널 - 게임 뷰
+                EditorGUILayout.BeginVertical();
+                DrawGameView();
+                EditorGUILayout.EndVertical();
+
+                EditorGUILayout.EndHorizontal();
+
+                // 게임 입력 처리
+                HandleGameInput();
+            }
+            else
+            {
+                // 일반 에디터 모드
+                EditorGUILayout.BeginHorizontal();
+
+                // 왼쪽 패널 - 속성
+                EditorGUILayout.BeginVertical(GUILayout.Width(250));
+                DrawPropertyPanel();
+                EditorGUILayout.EndVertical();
+
+                // 오른쪽 패널 - 그리드
+                EditorGUILayout.BeginVertical();
+                DrawGrid();
+                EditorGUILayout.EndVertical();
+
+                EditorGUILayout.EndHorizontal();
+
+                // JSON 변환 패널
+                if (showJsonPanel)
+                {
+                    DrawJsonPanel();
+                }
+
+                // 일반 에디터 입력 처리
+                HandleInput();
+            }
 
             if (GUI.changed)
             {

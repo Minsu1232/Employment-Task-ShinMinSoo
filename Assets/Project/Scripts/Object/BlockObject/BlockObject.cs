@@ -21,16 +21,9 @@ public class BlockObject : MonoBehaviour
 
     public void SetCoordinate(Vector2 centerPos)
     {
-        /*float offsetX = (transform.position.x > previousPosition.x) ? 0.05f : -0.05f;
-        float offsetY = (transform.position.z > previousPosition.z) ? 0.05f : -0.05f;*/
-
-        /*x = Mathf.Round((transform.position.x + offsetX) / 0.795f);
-        y = Mathf.Round((transform.position.z + offsetY) / 0.795f);*/
-
+ 
         x = centerPos.x + offsetToCenter.x;
-        y = centerPos.y + offsetToCenter.y;
-
-        //CheckBelowBoardBlock();
+        y = centerPos.y + offsetToCenter.y;    
 
         previousPosition = transform.position;
     }

@@ -10,259 +10,311 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de197bd1a1f4ba04b88f524d1e4d11b3, type: 3}
-  m_Name: Stage_1
+  m_Name: StageData_4
   m_EditorClassIdentifier: 
-  stageIndex: 1
+  stageIndex: 4
   boardBlocks:
-  - x: 2
-    y: 7
-    colorType: 0
+  - x: 0
+    y: 0
+    colorType: 7
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 1
+    y: 0
+    colorType: 7
     colorTypes: 
     dataTypes: 
     isCheckBlock: 0
   - x: 2
-    y: 6
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 2
-    y: 5
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 2
-    y: 4
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 2
-    y: 3
+    y: 0
     colorType: 0
     colorTypes: 
     dataTypes: 
     isCheckBlock: 0
   - x: 3
-    y: 7
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 3
-    y: 6
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 3
-    y: 5
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 3
-    y: 4
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 3
-    y: 3
+    y: 0
     colorType: 0
     colorTypes: 
     dataTypes: 
     isCheckBlock: 0
   - x: 4
-    y: 7
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 4
-    y: 6
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 4
-    y: 5
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 4
-    y: 4
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 4
-    y: 3
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 5
-    y: 7
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 5
-    y: 6
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 5
-    y: 5
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 5
-    y: 4
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 5
-    y: 3
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 6
-    y: 4
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 6
-    y: 3
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 6
-    y: 7
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 6
-    y: 6
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 6
-    y: 5
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 3
-    y: 2
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 4
-    y: 2
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 5
-    y: 2
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 6
-    y: 2
-    colorType: 0
-    colorTypes: 
-    dataTypes: 
-    isCheckBlock: 0
-  - x: 7
-    y: 4
+    y: 0
     colorType: 3
     colorTypes: 
     dataTypes: 
     isCheckBlock: 0
-  - x: 7
-    y: 3
+  - x: 5
+    y: 0
     colorType: 3
     colorTypes: 
     dataTypes: 
     isCheckBlock: 0
-  - x: 7
+  - x: 0
+    y: 1
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 1
+    y: 1
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 2
+    y: 1
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 3
+    y: 1
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 4
+    y: 1
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 5
+    y: 1
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 0
     y: 2
-    colorType: 3
+    colorType: 6
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 1
+    y: 2
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 2
+    y: 2
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 3
+    y: 2
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 4
+    y: 2
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 5
+    y: 2
+    colorType: 8
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 0
+    y: 3
+    colorType: 6
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 1
+    y: 3
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 2
+    y: 3
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 3
+    y: 3
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 4
+    y: 3
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 5
+    y: 3
+    colorType: 8
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 0
+    y: 4
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 1
+    y: 4
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 2
+    y: 4
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 3
+    y: 4
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 4
+    y: 4
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 5
+    y: 4
+    colorType: 0
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 0
+    y: 5
+    colorType: 5
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 1
+    y: 5
+    colorType: 5
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 2
+    y: 5
+    colorType: 5
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 3
+    y: 5
+    colorType: 1
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 4
+    y: 5
+    colorType: 1
+    colorTypes: 
+    dataTypes: 
+    isCheckBlock: 0
+  - x: 5
+    y: 5
+    colorType: 1
     colorTypes: 
     dataTypes: 
     isCheckBlock: 0
   playingBlocks:
   - x: 0
     y: 0
-    colorType: 3
-    center: {x: 3, y: 4}
+    colorType: 7
+    center: {x: 1, y: 0}
     uniqueIndex: 0
     shapes:
     - offset: {x: 0, y: 0}
-    - offset: {x: 0, y: -1}
     - offset: {x: 1, y: 0}
-    - offset: {x: 1, y: -1}
+    - offset: {x: 0, y: 1}
     gimmicks:
     - gimmickType: None
   - x: 0
     y: 0
     colorType: 3
-    center: {x: 3, y: 6}
+    center: {x: 4, y: 1}
     uniqueIndex: 1
     shapes:
     - offset: {x: 0, y: 0}
-    - offset: {x: 1, y: 0}
-    - offset: {x: 1, y: 1}
+    - offset: {x: -1, y: 0}
+    - offset: {x: 0, y: -1}
     gimmicks:
     - gimmickType: None
   - x: 0
     y: 0
     colorType: 3
-    center: {x: 5, y: 6}
+    center: {x: 0, y: 2}
     uniqueIndex: 2
     shapes:
     - offset: {x: 0, y: 0}
-    - offset: {x: 1, y: 0}
+    - offset: {x: 0, y: 1}
     gimmicks:
     - gimmickType: None
-  walls:
-  - x: 7
-    y: 2
-    wallDirection: 4
-    length: 3
-    wallColor: 3
-    wallGimmickType: 0
-  - x: 7
-    y: 4
-    wallDirection: 9
-    length: 1
-    wallColor: 0
-    wallGimmickType: 0
-  - x: 7
-    y: 2
-    wallDirection: 10
-    length: 1
-    wallColor: 0
-    wallGimmickType: 0
-  - x: 2
-    y: 2
-    wallDirection: 10
-    length: 4
-    wallColor: 0
-    wallGimmickType: 0
-  checkGroups: []
+  - x: 0
+    y: 0
+    colorType: 6
+    center: {x: 1, y: 2}
+    uniqueIndex: 3
+    shapes:
+    - offset: {x: 0, y: 0}
+    - offset: {x: 1, y: 0}
+    - offset: {x: 2, y: 0}
+    gimmicks:
+    - gimmickType: None
+  - x: 0
+    y: 0
+    colorType: 8
+    center: {x: 2, y: 3}
+    uniqueIndex: 4
+    shapes:
+    - offset: {x: 0, y: 0}
+    - offset: {x: 1, y: 0}
+    - offset: {x: 2, y: 0}
+    gimmicks:
+    - gimmickType: None
+  - x: 0
+    y: 0
+    colorType: 7
+    center: {x: 5, y: 2}
+    uniqueIndex: 5
+    shapes:
+    - offset: {x: 0, y: 0}
+    - offset: {x: 0, y: 1}
+    gimmicks:
+    - gimmickType: None
+  - x: 0
+    y: 0
+    colorType: 1
+    center: {x: 0, y: 4}
+    uniqueIndex: 6
+    shapes:
+    - offset: {x: 0, y: 0}
+    - offset: {x: 1, y: 0}
+    - offset: {x: 2, y: 0}
+    gimmicks:
+    - gimmickType: None
+  - x: 0
+    y: 0
+    colorType: 5
+    center: {x: 3, y: 4}
+    uniqueIndex: 7
+    shapes:
+    - offset: {x: 0, y: 0}
+    - offset: {x: 1, y: 0}
+    - offset: {x: 2, y: 0}
+    gimmicks:
+    - gimmickType: None
+  walls: []

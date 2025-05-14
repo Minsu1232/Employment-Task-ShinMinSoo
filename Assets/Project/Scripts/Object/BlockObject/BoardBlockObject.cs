@@ -11,15 +11,12 @@ namespace Project.Scripts.Controller
     {
         public BlockObject playingBlock;
         public bool isCheckBlock;
-        public List<int> checkGroupIdx = new List<int>();
-        public List<ColorType> colorType = new List<ColorType>();
-        public List<bool> isHorizon = new List<bool>();
-        public List<int> len = new List<int>();
+        public List<int> checkGroupIdx;
+        public List<ColorType> colorType;
+        public List<bool> isHorizon;
+        public List<int> len;
         public int x;
         public int y;
-
-        // 뷰 컴포넌트 참조
-        private BoardBlockView boardBlockView;
 
         // 이벤트 정의
         public delegate bool CheckDestroyHandler(BoardBlockObject boardBlock, BlockObject block);
@@ -40,51 +37,47 @@ namespace Project.Scripts.Controller
         public ColorType verticalColorType =>
             isHorizon.IndexOf(false) != -1 ? colorType[isHorizon.IndexOf(false)] : ColorType.None;
 
-        private void Awake()
-        {
-            // 뷰 컴포넌트 참조 가져오기
-            boardBlockView = GetComponent<BoardBlockView>();
-            if (boardBlockView == null)
-            {
-                boardBlockView = gameObject.AddComponent<BoardBlockView>();
-            }
-        }
-
-        private void Start()
-        {
-            // 체크 블록 표시 설정
-            if (boardBlockView != null && isCheckBlock)
-            {
-                boardBlockView.ShowCheckBlockIndicator(true);
-            }
-        }
+ 
 
         public bool CheckAdjacentBlock(BlockObject block, Vector3 destroyStartPos)
         {
-            
-            if (!isCheckBlock) return false;
-            if (!block.dragHandler.enabled) return false;
-
             for (int i = 0; i < colorType.Count; i++)
             {
                 if (block.colorType == colorType[i])
-                {
+                {                  
+
                     int length = 0;
                     if (isHorizon[i])
                     {
-                        if (block.dragHandler.horizon > len[i]) return false;
+                        if (block.dragHandler.horizon > len[i])
+                        {
+                            
+                            return false;
+                        }
                         // 이벤트 호출로 변경
-                        if (OnCheckDestroy == null || !OnCheckDestroy(this, block)) return false;
+                        if (OnCheckDestroy == null || !OnCheckDestroy(this, block))
+                        {
+                            
+                            return false;
+                        }
                         length = block.dragHandler.vertical;
                     }
                     else
                     {
-                        if (block.dragHandler.vertical > len[i]) return false;
+                        if (block.dragHandler.vertical > len[i])
+                        {
+                           
+                            return false;
+                        }
                         // 이벤트 호출로 변경
-                        if (OnCheckDestroy == null || !OnCheckDestroy(this, block)) return false;
+                        if (OnCheckDestroy == null || !OnCheckDestroy(this, block))
+                        {
+                            
+                            return false;
+                        }
                         length = block.dragHandler.horizon;
+                        
                     }
-
                     block.dragHandler.transform.position = destroyStartPos;
                     block.dragHandler.ReleaseInput();
 
@@ -115,7 +108,8 @@ namespace Project.Scripts.Controller
                     LaunchDirection direction = GetLaunchDirection(x, y, isHorizon[i], boardWidth, boardHeight);
                     Quaternion rotation = Quaternion.identity;
 
-                    centerPos.y = 0.55f;
+                    centerPos.y = 0.55f;                  
+
                     switch (direction)
                     {
                         case LaunchDirection.Up:
@@ -126,9 +120,13 @@ namespace Project.Scripts.Controller
                             break;
                         case LaunchDirection.Down:
                             centerPos += Vector3.back * 0.65f;
+                            centerPos.z = transform.position.z;
+                            centerPos.z -= 0.55f;  // Down 방향 보정
                             break;
                         case LaunchDirection.Left:
                             centerPos += Vector3.left * 0.55f;
+                            centerPos.x = transform.position.x;  // 좌측 위치 보정
+                            centerPos.x -= 0.55f;  // 추가 보정
                             rotation = Quaternion.Euler(0, 90, 0);
                             break;
                         case LaunchDirection.Right:
@@ -137,7 +135,8 @@ namespace Project.Scripts.Controller
                             centerPos.x += 0.65f;
                             rotation = Quaternion.Euler(0, -90, 0);
                             break;
-                    }
+                    }                  
+
                     BlockDestroyManager blockDestroyManager = StageController.Instance.GetBlockDestroyManager();
                     if (blockDestroyManager != null)
                     {
@@ -149,13 +148,15 @@ namespace Project.Scripts.Controller
                             block.colorType,   // 블록 색상
                             rotation
                         );
+                        
                     }
-
+                   
 
                     return true;
                 }
             }
 
+           
             return false;
         }
 
@@ -164,37 +165,43 @@ namespace Project.Scripts.Controller
         /// </summary>
         private LaunchDirection GetLaunchDirection(int x, int y, bool isHorizon, int boardWidth, int boardHeight)
         {
-            // 모서리 케이스들
-            if (x == 0 && y == 0)
-                return isHorizon ? LaunchDirection.Down : LaunchDirection.Left;
+            if (isHorizon)
+            {
+                if (y == 0) return LaunchDirection.Down;
+                if (y == boardHeight) return LaunchDirection.Up;
+                if (y < boardHeight / 2) return LaunchDirection.Down;
+                else return LaunchDirection.Up;
+            }
+            else
+            {
+                if (x == 0) return LaunchDirection.Left;
+                if (x == boardWidth) return LaunchDirection.Right;
+                if (x < boardWidth / 2) return LaunchDirection.Left;
+                else return LaunchDirection.Right;
+            }
+        }
+        /// <summary>
+        /// 보드 블록의 메테리얼을 설정합니다
+        /// </summary>
+        public void SetMaterial(Material material, bool isColorBlock)
+        {
+            // 렌더러 컴포넌트 찾기
+            Renderer blockRenderer = GetComponentInChildren<Renderer>();
+            if (blockRenderer != null && material != null)
+            {
+                // 메테리얼 설정
+                blockRenderer.material = material;
+            }
 
-            if (x == 0 && y == boardHeight)
-                return isHorizon ? LaunchDirection.Up : LaunchDirection.Left;
-
-            if (x == boardWidth && y == 0)
-                return isHorizon ? LaunchDirection.Down : LaunchDirection.Right;
-
-            if (x == boardWidth && y == boardHeight)
-                return isHorizon ? LaunchDirection.Up : LaunchDirection.Right;
-
-            // 기본 경계 케이스들
-            if (x == 0)
-                return isHorizon ? LaunchDirection.Down : LaunchDirection.Left;
-
-            if (y == 0)
-                return isHorizon ? LaunchDirection.Down : LaunchDirection.Left;
-
-            if (x == boardWidth)
-                return isHorizon ? LaunchDirection.Down : LaunchDirection.Right;
-
-            if (y == boardHeight)
-                return isHorizon ? LaunchDirection.Up : LaunchDirection.Right;
-
-            // 기본값
-            return LaunchDirection.Up;
+            // 색상 블록 여부에 따른 추가 설정
+            if (isColorBlock)
+            {
+                // 색상 블록인 경우 체크 블록으로 설정
+                isCheckBlock = true;
+            }
         }
     }
-
+    
     public enum LaunchDirection
     {
         Up,

@@ -23,6 +23,8 @@ Shader"Custom/BlockStencilReader"
         _StencilRef("Stencil Ref", Range(0, 255)) = 1
         _ClipPlanePos("Clip Plane Position", Vector) = (0,0,0,0)
         _ClipPlaneNormal("Clip Plane Normal", Vector) = (0,0,0,1)
+
+_MinHeight("Minimum Height", Float) = 0.0
     }
     
     SubShader
@@ -33,15 +35,19 @@ Shader"Custom/BlockStencilReader"
             "RenderPipeline" = "UniversalPipeline"
             "Queue" = "Geometry"
         }
-LOD 300
+LOD 100
         
         // 스텐실 설정은 주석 처리 (필요 없음)
          Stencil
 {
     Ref[_StencilRef]
-    Comp
-    NotEqual // 원래대로 NotEqual 유지
-    Pass
+            Comp
+    NotEqual
+            Pass
+    Keep
+            Fail
+    Keep
+            ZFail
     Keep
 
 }
@@ -116,6 +122,8 @@ float4 _ClipPlaneNormal;
 float _Surface;
 float _Blend;
 float _Cutoff;
+float _ClipThickness;
+float _MinHeight; // 추가된 부분
 CBUFFER_END
             
             Varyings vert(
@@ -172,16 +180,83 @@ half4 frag(Varyings input) : SV_Target
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
                 
                 
-  // 클리핑 플레인 처리와 스텐실 테스트 조합
-  // 클리핑 평면 Tolerance 추가
+   // 클리핑 평면 계산
     float3 planePos = _ClipPlanePos.xyz;
     float3 planeNormal = normalize(_ClipPlaneNormal.xyz);
     float dist = dot(input.positionWS - planePos, planeNormal);
     
-    // 클리핑에 미세한 여유 추가
-    float clipTolerance = 0.005f;
-    clip(dist + clipTolerance); // 약간의 여유 추가
-
+    // 클리핑 두께 적용 (바닥 근처일 때)
+    if (_ClipThickness > 0.001f)
+    {
+        // 카메라 방향 고려
+        float3 camDir = normalize(_WorldSpaceCameraPos - input.positionWS);
+        float camDot = dot(camDir, planeNormal);
+        
+        // 카메라가 클리핑 평면에 수직에 가까울수록 더 두껍게 처리
+        float thicknessFactor = abs(camDot);
+        float adjustedThickness = _ClipThickness * (1.0 - thicknessFactor);
+        
+        // 조정된 거리 계산
+        dist -= adjustedThickness;
+    }
+    
+    clip(dist);
+    // 높이 기반 클리핑 추가 - 이 부분을 추가
+    if (input.positionWS.y < _MinHeight)
+    {
+        // 바닥 근처는 클리핑에 영향 받지 않음
+        float2 uv = input.uv;
+        float4 albedoAlpha = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv);
+        float4 albedo = albedoAlpha * _BaseColor;
+        
+        // 노멀맵 계산
+#if defined(_NORMALMAP)
+            float3 normalTS = UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, uv), _BumpScale);
+            float3 normalWS = TransformTangentToWorld(normalTS,
+                float3x3(input.tangentWS.xyz, cross(input.normalWS, input.tangentWS.xyz) * input.tangentWS.w, input.normalWS));
+#else
+        float3 normalWS = input.normalWS;
+#endif
+        normalWS = normalize(normalWS);
+        
+        // PBR 설정
+        float metallic = _Metallic;
+        float smoothness = _Smoothness;
+        float occlusion = SAMPLE_TEXTURE2D(_OcclusionMap, sampler_OcclusionMap, uv).r;
+        
+        // 라이팅 계산
+        InputData inputData = (InputData) 0;
+        inputData.positionWS = input.positionWS;
+        inputData.normalWS = normalWS;
+        inputData.viewDirectionWS = normalize(input.viewDirWS);
+        inputData.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+#ifdef LIGHTMAP_ON
+            inputData.bakedGI = SampleLightmap(input.lightmapUV, normalWS);
+#else
+        inputData.bakedGI = SampleSH(normalWS);
+#endif
+        
+        // 최종 색상 계산
+        SurfaceData surfaceData = (SurfaceData) 0;
+        surfaceData.albedo = albedo.rgb;
+        surfaceData.metallic = metallic;
+        surfaceData.specular = 0;
+        surfaceData.smoothness = smoothness;
+        surfaceData.occlusion = occlusion;
+        surfaceData.emission = 0;
+#if defined(_SURFACE_TYPE_TRANSPARENT)
+            surfaceData.alpha = albedo.a;
+#else
+        surfaceData.alpha = 1.0;
+#endif
+        surfaceData.clearCoatMask = 0;
+        surfaceData.clearCoatSmoothness = 0;
+        
+        half4 color = UniversalFragmentPBR(inputData, surfaceData);
+        color.a = OutputAlpha(albedo.a, _Surface, _Blend);
+        
+        return color;
+    }
                 
                 // 텍스처 및 색상
     float2 uv = input.uv;

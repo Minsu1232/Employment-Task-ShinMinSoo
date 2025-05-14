@@ -29,7 +29,11 @@ namespace Project.Scripts.Model
             get => wallColor;
             set => wallColor = value;
         }
-        public WallGimmickType WallGimmickType => wallGimmickType;
+        public WallGimmickType WallGimmickType
+        {
+            get => wallGimmickType;
+            set => wallGimmickType = value;
+        }
 
         public WallData() : base() { }
 

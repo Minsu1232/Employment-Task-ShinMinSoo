@@ -153,9 +153,7 @@ namespace Project.Scripts.View
 
             // 벽 방향에 따른 클리핑 방향 계산
             Vector3 clipNormal = vertexStencilEffectView.CalculateClipNormal(direction);
-
-            // 디버그 로그 추가
-            Debug.Log($"Wall Direction: {direction}, Clip Normal: {clipNormal}, Wall Position: {wallPosition}");
+        
 
             // 블록에 클리핑 효과 적용
             vertexStencilEffectView.ApplyClippingToBlock(block, wallPosition, clipNormal);
@@ -199,7 +197,7 @@ namespace Project.Scripts.View
         private Vector2Int GetBoardSize()
         {
             if (StageController.Instance != null)
-            {
+            {                
                 return new Vector2Int(StageController.Instance.boardWidth, StageController.Instance.boardHeight);
             }
             return new Vector2Int(10, 10); // 기본값

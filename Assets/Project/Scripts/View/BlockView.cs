@@ -53,7 +53,7 @@ namespace Project.Scripts.View
             }
 
             // 아웃라인 컴포넌트 초기화
-            InitializeOutline();
+            //InitializeOutline();
 
             // 원본 색상 저장
             if (meshRenderer != null && meshRenderer.material != null)
